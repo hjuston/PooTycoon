@@ -1,0 +1,110 @@
+[Bonus za obejrzenie reklamy - "udro¿nienie systemu kanalizacji" - totalIncome x2 przez 2 godziny]
+[Bonus za obejrzenie reklamy - X punktów premium]
+
+Struktura
+
+[Miasto] (Prestige - zwiêksza iloœæ turystów (prestige zdobywa siê przez budowle typu hotel, kino, centrum handlowe))
+	Desc: Prestige zwiêksza iloœæ turystów. Zdobywa siê go poprzez budowle turystyczne typu hotel, kino, centrum handlowe.
+		  Iloœæ turystów to dodatkowy mno¿nik sh/s.
+
+	[Buildings] (Nazwa, Typ, iloœæ sh/s)
+		Desc: Budynki dziel¹ siê na 3 typy. 1 - Mieszkania (dom, blok itp.) 2 - Budynki turystyczne (kino, hotel...)
+			  3 - Budynki infrastruktury (Oczyszczalnia, ?)
+
+			  
+			- na poziomach 10, 25, 50, 75, 100 maj¹ ulepszenia (baseIncome)
+			- ka¿de ulepszenie budynku zwiêksza sh/s
+			- co 150 lvli odblokowuje siê nowy budynek i mo¿na przekszta³ciæ istniej¹cy w lepszy
+				np. Hut -> small house, hotel* -> hotel ** 
+
+Standard		
+	- Hut -> Small house -> Big house -> Apartment block -> Pension -> Villa -> Mansion -> Palace ->  Skyscraper
+
+** odblokowywanie po jakimœ czasie
+Infrastruktura	
+	- Small factory -> Large factory -> Powerful factory -> Factory v2
+	- Sludgeworks H1Z1 -> Sludgeworks D2H1 -> Sludgeworks BU38 -> Sludgeworks ABC1 -> Sludgeworks C17
+	- Waterworks v1 -> Waterworks v2 -> Waterworks v3 -> Waterworks v4 -> Waterworks v4.5
+	- Cage -> Prison -> Political prison -> Military prison -> Modern prison
+
+** odblokowywane po jakimœ czasie (po infrastrukturze)
+Prestige		
+	- Hotel* -> Hotel** -> Hotel*** -> Hotel**** -> Hotel *****
+	- Car cinema -> Cinema building -> Modern cinema -> 
+	- Park -> Underinvested park -> Large park -> 
+	- Shopping mall -> Large shopping mall
+	- Food automatat -> Hot dog stand -> Sandwitch bar -> Fast food -> Family restaurant -> Seafood restaurant -> Chef's restaurant
+	- Bus station -> Train station -> Metro -> Intercontinental train station -> Capsule transport station -> Worldwide underground capsule station
+	- Amusement park -> Amusement park II -> Amusement park III
+	- Zoo -> Safari zoo -> Ice zoo -> Aquapark -> Rare animals Zoo -> Space zoo
+
+
+MENU
+		 ____________________________________
+		|INFO PANEL|                         |* Building info + upgrade
+		|----------+                         |* 
+		|                                    |* 
+		|                                    |* 
+		|                                    |* Bonus points shop + PLN
+		|                                    |* Reset menu
+		|____________________________________|* Options (sound, animations, start new game, exit)
+
+
+TODO:
+2. Zaimplementowaæ typy budynków, a nastêpnie stworzyæ ich prefaby -- DOKOÑCZYC
+
+3. Zaimplemenowaæ tryb Away.
+	- Zapisaæ czas zamkniêcia aplikacji
+	- Po ponownym uruchomieniu obliczyæ ró¿nicê czasu i na podstawie Income/s obliczyæ AwayIncome
+
+4. Stworzyæ menu startowe gry ?
+
+5. Stworzyæ menu opcji gry (dŸwiêk, credits, ?)
+	- w creditsach daæ informacje o autorach ikonek (licencja) lub stworzyæ w³asne ikonki
+
+6. Stworzyæ menu zakupów premium
+	- mo¿liwoœæ kupna Instant sh/s
+	- mo¿liwoœæ kupna Sh/s x2 Forever
+	- reset drzewka pasywek (level)
+	- instant reset
+	- mo¿liwoœæ zakupu punktów premium za gotówkê (PLN)
+
+10. Dodaæ obrazki dla wszystkich budynków (do panelu z budowlami) -- DOKOÑCZYC
+
+11. Ulepszenia
+	- dodaæ obrazki 
+	- dodaæ opisy
+	- dodaæ nazwy (wymyœliæ coœ)
+	- dodaæ inne typy ulepszeñ
+
+12. Dodaæ resety
+
+13. Balans budynków
+	- dodaæ koszta
+	- dodaæ przychody
+
+14. Dodaæ klasê, która zlicza staty
+	- Lifetime cash
+	- current reset cash
+	- buildings bought
+	- upgrades bought
+	- total bonus points earned
+	- time played from beginning
+	- resets count
+	- lifetime - hut levels, small house levels, etc...
+	- current reset - hut levels, small house levels
+
+15. Na podstawie klasy zliczaj¹cej staty dodaæ odblokowywanie budynków 
+	- np. small house od 50 lvli Hut (³¹cznie), BigHouse od 40 lvli SmallHouse (³¹cznie)
+	- wyœwietlaæ informacje w panelu budynków
+	- dodaæ aktywne/nieaktywne panele budynków
+
+17. Poprawiæ wygl¹d menu do pozycjonowania budynku
+
+19. Dodaæ system zakupów za punkty premium
+
+20. LEVEL
+	- dodaæ drzewko umiejêtnoœæi pasywnych (np. total income + 10%, prestige income + 5%)
+	- w drzewku mo¿na odblokowywaæ budowle?
+
+21. Zamieniæ wszystkie inputy mouse na touche
