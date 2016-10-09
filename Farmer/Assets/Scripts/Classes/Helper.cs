@@ -2,8 +2,21 @@
 using System.Collections;
 using System.Linq;
 using System.ComponentModel;
+using UnityEngine.EventSystems;
 
-public static class Helper {
+public static class Helper
+{
+  // 0 - touch, -1 - mouse
+  private static int fingerId = 0;
+
+  /// <summary>
+  ///  Metoda zwraca informację o tym, czy wskaźnik znjduje się nad jakimś elementem GUI.
+  /// </summary>
+  /// <returns></returns>
+  public static bool IsPointerAboveGUI()
+  {
+    return EventSystem.current.IsPointerOverGameObject(fingerId);
+  }
 
 	/// <summary>
 	/// Metoda zwraca obiekt TileManager.

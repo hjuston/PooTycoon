@@ -61,6 +61,8 @@ TODO:
 
 5. Stworzyæ menu opcji gry (dŸwiêk, credits, ?)
 	- w creditsach daæ informacje o autorach ikonek (licencja) lub stworzyæ w³asne ikonki
+   - dŸwiêk
+   - reset gry do zera
 
 6. Stworzyæ menu zakupów premium
 	- mo¿liwoœæ kupna Instant sh/s
@@ -99,7 +101,7 @@ TODO:
 	- wyœwietlaæ informacje w panelu budynków
 	- dodaæ aktywne/nieaktywne panele budynków
 
-17. Poprawiæ wygl¹d menu do pozycjonowania budynku
+- - - 17. Poprawiæ wygl¹d menu do pozycjonowania budynku
 
 19. Dodaæ system zakupów za punkty premium
 
@@ -107,4 +109,4 @@ TODO:
 	- dodaæ drzewko umiejêtnoœæi pasywnych (np. total income + 10%, prestige income + 5%)
 	- w drzewku mo¿na odblokowywaæ budowle?
 
-21. Zamieniæ wszystkie inputy mouse na touche
+21. Dodaæ zapamiêtywanie ustawieñ - budynków, opcji, statystyk po zamkniêciu gry

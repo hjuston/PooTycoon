@@ -9,7 +9,7 @@ public class GridManager : MonoBehaviour
 	private GameObject GhostObject
 	{
 		get { return _ghostObject; }
-		set { _ghostObject = value; /*_ghostObjectOriginalColor = (value == null) ? Color.white : value.GetComponent<Renderer>().material.color;*/ }
+		set { _ghostObject = value; }
 	}
 
 	// Przycisk potwierdzenia do postawienia budynku
@@ -21,20 +21,23 @@ public class GridManager : MonoBehaviour
 		// można go wtedy przenieść lub sprzedać
 		if (Helper.GetGameManager().IsEditMode())
 		{
-			if(Input.GetMouseButtonDown(0))
-			{
-				RaycastHit hitInfo;
-				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+         if(Input.touchCount > 0)
+         {
+            if(Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
+            {
+               RaycastHit hitInfo;
+               Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
 
-				if(Physics.Raycast(ray, out hitInfo))
-				{
-					if (hitInfo.collider.tag == CONSTS.BuildingTag && GhostObject == null)
-					{
-						GhostObject = hitInfo.collider.gameObject;
-						ActivateGhostObject();
-					}
-				}
-			}
+               if (Physics.Raycast(ray, out hitInfo))
+               {
+                  if (hitInfo.collider.tag == CONSTS.BuildingTag && GhostObject == null)
+                  {
+                     GhostObject = hitInfo.collider.gameObject;
+                     ActivateGhostObject();
+                  }
+               }
+            }
+         }
 		}
 	}
 
@@ -99,14 +102,14 @@ public class GridManager : MonoBehaviour
 					buildingScript.IsPlacedForReal = true;
 					
 					// Wydanie pieniędzy
-					Helper.GetGameManager().SpendMoney(buildingScript.GetCost());
+					Helper.GetGameStats().SpendMoney(buildingScript.GetCost());
                     Helper.GetGameStats().AddExperience(buildingScript.BuildingBuyExperience);
 				}
 			}
 
 			GhostObject = null;
             Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(false);
-            Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameManager().GetCurrentIncome());
+            Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
         }
 	}
 
@@ -153,12 +156,12 @@ public class GridManager : MonoBehaviour
         {
             if (buildingScript.IsPlacedForReal)
             {
-                Helper.GetGameManager().AddMoney(buildingScript.GetSellPrice());
+                Helper.GetGameStats().AddMoney(buildingScript.GetSellPrice());
             }
         }
 
         Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(false);
-        Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameManager().GetCurrentIncome());
+        Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
         GameObject.Destroy(GhostObject);
         GhostObject = null;
     }

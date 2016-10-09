@@ -7,179 +7,126 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
-    private BigInteger _currentMoney = new BigInteger("123123331");
+   private bool EditMode = false;
 
-    private bool EditMode = false;
+   private Building selectedBuilding;
 
-    private Building selectedBuilding;
+   public void SetCurrentlySelectedBuilding(Building building)
+   {
+      selectedBuilding = building;
+   }
 
-    public void SetCurrentlySelectedBuilding(Building building)
-    {
-        selectedBuilding = building;
-    }
+   public Building GetCurrentlySelectedBuilding()
+   {
+      return selectedBuilding;
+   }
 
-    void Start()
-    {
-        // Wczytywanie bazy danych budynków
-        BuildingsDatabase.LoadDatabase();
+   void Start()
+   {
+      // Wczytywanie bazy danych budynków
+      BuildingsDatabase.LoadDatabase();
+   }
 
-        InvokeRepeating("CollectMoney", 0f, 1f);
-    }
-
-    void Update()
-    {
-        // Sprawdzanie czy budynek został kliknięty? Jeżeli tak to wyświetlić menu ulepszeń
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+   void Update()
+   {
+      // Sprawdzanie czy budynek został kliknięty? Jeżeli tak to wyświetlić menu ulepszeń
+      if (Input.touchCount > 0)
+      {
+         if (Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
+         {
+            Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
             RaycastHit hitInfo;
 
             if (Physics.Raycast(ray, out hitInfo))
             {
-                if (!IsEditMode() && hitInfo.collider.tag == "Building")
-                {
-                    Building buildingScript = hitInfo.collider.GetComponent<Building>();
-                    if (buildingScript != null)
-                    {
-                        Helper.GetGUIManager().BuildingMode_SetBuildingInfo(buildingScript);
+               if (!IsEditMode() && hitInfo.collider.tag == "Building")
+               {
+                  Building buildingScript = hitInfo.collider.GetComponent<Building>();
+                  if (buildingScript != null)
+                  {
+                     Helper.GetGUIManager().BuildingMode_SetBuildingInfo(buildingScript);
 
-                        // Wyświetlanie markera
-                        Helper.GetGUIManager().BuildingMode_CurrentBuildingMarkerShow();
-                        Helper.GetGUIManager().BuildingMode_CurrentBuildingMarkerSetPosition(hitInfo.collider.transform.position);
-                    }
-                }
+                     // Wyświetlanie markera
+                     Helper.GetGUIManager().BuildingMode_CurrentBuildingMarkerShow(hitInfo.collider.gameObject);
+                  }
+               }
             }
-        }
-    }
+         }
+      }
+   }
 
-    /// <summary>
-    /// Metoda zwraca informację, czy gra znajduje się w trybie edycji
-    /// </summary>
-    /// <returns></returns>
-    public bool IsEditMode()
-    {
-        return EditMode;
-    }
+   /// <summary>
+   /// Metoda zwraca informację, czy gra znajduje się w trybie edycji
+   /// </summary>
+   /// <returns></returns>
+   public bool IsEditMode()
+   {
+      return EditMode;
+   }
 
-    /// <summary>
-    /// Metoda zwiększa ilość gotówki (np. w przypadku sprzedania budynku)
-    /// </summary>
-    /// <param name="money"></param>
-    public void AddMoney(BigInteger money)
-    {
-        _currentMoney += money;
-        Helper.GetGUIManager().GameStats_SetCurrentMoneyInfo(_currentMoney);
-    }
+   /// <summary>
+   /// Metoda włącza tryb edycji
+   /// </summary>
+   public void SetEditMode(bool val)
+   {
+      EditMode = val;
+   }
 
 
-    /// <summary>
-    /// Metoda zlicza przychody z budynków i dodaje je do aktualnej gotówki
-    /// </summary>
-    void CollectMoney()
-    {
-        // Zliczanie gotówki jeżeli gra nie jest w trybie edycji budowli
-        if (!EditMode)
-        {
-            _currentMoney += GetCurrentIncome();//_generateMoneyCount;
-            Helper.GetGUIManager().GameStats_SetCurrentMoneyInfo(_currentMoney);
-        }
-    }
+   public void UpgradeBuilding()
+   {
+      BigInteger buildingCost = selectedBuilding.CalculateCostForNextXLevels(upgradeBy);
 
-    public BigInteger GetCurrentIncome()
-    {
-        BigInteger income = new BigInteger("0");
+      if (Helper.GetGameStats().GetCurrentMoney() >= buildingCost)
+      {
+         Helper.GetGameStats().SpendMoney(buildingCost);
+         selectedBuilding.Upgrade(upgradeBy);
 
-        GameObject buildingGroup = GameObject.FindGameObjectWithTag(CONSTS.BuildingsGroupTag);
-        if(buildingGroup != null)
-        {
-            Building[] buildings = buildingGroup.GetComponentsInChildren<Building>();
+         Helper.GetGameStats().AddExperience(selectedBuilding.BuildingUpgardeExperience * upgradeBy);
 
-            foreach (Building building in buildings)
+         Helper.GetGUIManager().BuildingMode_SetBuildingInfo(selectedBuilding);
+         if (upgradeBy != 1)
+         {
+            Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
+         }
+
+         Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
+      }
+   }
+
+   int upgradeBy = 1;
+   public void ToggleUpgradeBy(int levels)
+   {
+      upgradeBy = levels;
+      Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
+      Helper.GetGUIManager().BuildingMode_SetMultiplierButtonActive();
+   }
+
+   public int GetUpgradeByValue()
+   {
+      return upgradeBy;
+   }
+
+   public void BuyBuildingUpgrade(Upgrade upgrade)
+   {
+      if (selectedBuilding != null && selectedBuilding.Upgrades.Contains(upgrade))
+      {
+         if (Helper.GetGameStats().GetCurrentMoney() >= new BigInteger(upgrade.Cost) && selectedBuilding.BuildingLevel >= upgrade.RequiredLevel)
+         {
+            // Activate upgrade
+            if (selectedBuilding.ActivateUpgrade(upgrade))
             {
-                income += building.GetIncome();
+               Helper.GetGameStats().SpendMoney(new BigInteger(upgrade.Cost));
+
+               Helper.GetGUIManager().BuildingMode_SetBuildingInfo(selectedBuilding);
+               if (upgradeBy != 1)
+               {
+                  Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
+               }
+
+               Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
             }
-        }
-
-        return income;
-    }
-
-    /// <summary>
-    /// Metoda zwraca aktualną ilość gotówki.
-    /// </summary>
-    /// <returns></returns>
-    public BigInteger GetCurrentMoney()
-    {
-        return _currentMoney;
-    }
-
-
-    /// <summary>
-    /// Metoda zmniejsza ilosć gotówki
-    /// </summary>
-    /// <returns></returns>
-    public void SpendMoney(BigInteger money)
-    {
-        _currentMoney -= money;
-        Helper.GetGUIManager().GameStats_SetCurrentMoneyInfo(_currentMoney);
-    }
-
-    /// <summary>
-    /// Metoda włącza tryb edycji
-    /// </summary>
-    public void SetEditMode(bool val)
-    {
-        EditMode = val;
-    }
-
-
-    public void UpgradeBuilding()
-    {
-        BigInteger buildingCost = selectedBuilding.CalculateCostForNextXLevels(upgradeBy);
-
-        if(_currentMoney >= buildingCost)
-        {
-            SpendMoney(buildingCost);
-            selectedBuilding.Upgrade(upgradeBy);
-
-            Helper.GetGameStats().AddExperience(selectedBuilding.BuildingUpgardeExperience * upgradeBy);
-
-            Helper.GetGUIManager().BuildingMode_SetBuildingInfo(selectedBuilding);
-            if(upgradeBy != 1)
-            {
-                Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
-            }
-
-            Helper.GetGUIManager().GameStats_SetIncomeInfo(GetCurrentIncome());
-        }
-    }
-
-    int upgradeBy = 1;
-    public void ToggleUpgradeBy(int levels)
-    {
-        upgradeBy = levels;
-        Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
-    }
-
-    public void BuyBuildingUpgrade(Upgrade upgrade)
-    {
-        if(selectedBuilding != null && selectedBuilding.Upgrades.Contains(upgrade))
-        {
-            if(_currentMoney >= new BigInteger(upgrade.Cost) && selectedBuilding.BuildingLevel >= upgrade.RequiredLevel)
-            {
-                // Activate upgrade
-                if (selectedBuilding.ActivateUpgrade(upgrade))
-                {
-                    SpendMoney(new BigInteger(upgrade.Cost));
-
-                    Helper.GetGUIManager().BuildingMode_SetBuildingInfo(selectedBuilding);
-                    if (upgradeBy != 1)
-                    {
-                        Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
-                    }
-
-                    Helper.GetGUIManager().GameStats_SetIncomeInfo(GetCurrentIncome());
-                }
-            }
-        }
-    }
+         }
+      }
+   }
 }

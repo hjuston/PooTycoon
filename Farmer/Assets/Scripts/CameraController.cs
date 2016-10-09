@@ -17,7 +17,7 @@ public class CameraController : MonoBehaviour {
 			oldTouchPositions[0] = null;
 			oldTouchPositions[1] = null;
 		}
-		else if (Input.touchCount == 1)
+		else if (Input.touchCount == 1 && !Helper.IsPointerAboveGUI())
 		{
 			if (oldTouchPositions[0] == null || oldTouchPositions[1] != null)
 			{
