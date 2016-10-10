@@ -8,8 +8,9 @@ public class GhostFollowingButtonScript : MonoBehaviour
     void Update()
     {
         if (_ghostObject != null)
-        {
-            transform.position = Camera.main.WorldToScreenPoint(_ghostObject.transform.position);
+        { 
+            Vector3 position = _ghostObject.transform.position;
+            transform.position = Camera.main.WorldToScreenPoint(position) + new Vector3(0f, -50f);
         }
     }
 

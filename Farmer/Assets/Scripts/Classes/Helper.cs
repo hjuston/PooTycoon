@@ -15,7 +15,10 @@ public static class Helper
   /// <returns></returns>
   public static bool IsPointerAboveGUI()
   {
-    return EventSystem.current.IsPointerOverGameObject(fingerId);
+#if UNITY_EDITOR
+        fingerId = -1;
+#endif
+        return EventSystem.current.IsPointerOverGameObject(fingerId);
   }
 
 	/// <summary>
@@ -123,16 +126,16 @@ public static class Helper
 	/// Metoda zwraca obiekt GameStats
 	/// </summary>
 	/// <returns></returns>
-	public static GameStats GetGameStats()
-	{
-		GameStats result = null;
+	//public static GameStats GetGameStats()
+	//{
+	//	GameStats result = null;
 
-		GameObject gameStatsObject = GameObject.FindGameObjectWithTag(CONSTS.GameStatsTag);
-		if (gameStatsObject != null)
-		{
-			result = gameStatsObject.GetComponent<GameStats>();
-		}
+	//	GameObject gameStatsObject = GameObject.FindGameObjectWithTag(CONSTS.GameStatsTag);
+	//	if (gameStatsObject != null)
+	//	{
+	//		result = gameStatsObject.GetComponent<GameStats>();
+	//	}
 
-		return result;
-	}
+	//	return result;
+	//}
 }

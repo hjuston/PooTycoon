@@ -69,7 +69,7 @@ public class Building : MonoBehaviour {
     public BigInteger GetCost()
     {
 		// Wzór BaseCost * CostMultiplier ^ (BuildingLevel)
-		if (BaseCost == null) InitializeBase();
+		if (BaseCost == null || BaseCost == new BigInteger("0")) InitializeBase();
 
         return SimulateCost(BuildingLevel);
     }

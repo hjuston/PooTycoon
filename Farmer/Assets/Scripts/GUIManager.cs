@@ -435,7 +435,7 @@ public class GUIManager : MonoBehaviour
       else
       {
          BigInteger value = building.CalculateCostForNextXLevels(levels);
-         BigInteger currentMoney = Helper.GetGameStats().GetCurrentMoney();
+         BigInteger currentMoney = GameStats.Instance.GetCurrentMoney();
 
          BuildingMode_UpgradeCostText.text = Helper.GetDisplayableValue(value);
 

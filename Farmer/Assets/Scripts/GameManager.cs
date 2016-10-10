@@ -23,18 +23,32 @@ public class GameManager : MonoBehaviour
 
    void Start()
    {
-      // Wczytywanie bazy danych budynków
-      BuildingsDatabase.LoadDatabase();
+        // Wczytywanie bazy danych budynków
+
+        BuildingsDatabase.LoadDatabase();
+        SaveManager.LoadData();
+
+        InvokeRepeating("CollectMoney", 0f, 1f);
    }
+
+    void CollectMoney()
+    {
+        
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveManager.SaveData();
+    }
 
    void Update()
    {
       // Sprawdzanie czy budynek został kliknięty? Jeżeli tak to wyświetlić menu ulepszeń
-      if (Input.touchCount > 0)
+      if (Input.GetMouseButtonDown(0))//(Input.touchCount > 0)
       {
-         if (Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
-         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            //if (Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
+            //{
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);//Input.GetTouch(0).position);
             RaycastHit hitInfo;
 
             if (Physics.Raycast(ray, out hitInfo))
@@ -51,7 +65,7 @@ public class GameManager : MonoBehaviour
                   }
                }
             }
-         }
+         //}
       }
    }
 
@@ -77,12 +91,12 @@ public class GameManager : MonoBehaviour
    {
       BigInteger buildingCost = selectedBuilding.CalculateCostForNextXLevels(upgradeBy);
 
-      if (Helper.GetGameStats().GetCurrentMoney() >= buildingCost)
+      if (GameStats.Instance.GetCurrentMoney() >= buildingCost)
       {
-         Helper.GetGameStats().SpendMoney(buildingCost);
+            GameStats.Instance.SpendMoney(buildingCost);
          selectedBuilding.Upgrade(upgradeBy);
 
-         Helper.GetGameStats().AddExperience(selectedBuilding.BuildingUpgardeExperience * upgradeBy);
+            GameStats.Instance.AddExperience(selectedBuilding.BuildingUpgardeExperience * upgradeBy);
 
          Helper.GetGUIManager().BuildingMode_SetBuildingInfo(selectedBuilding);
          if (upgradeBy != 1)
@@ -90,7 +104,7 @@ public class GameManager : MonoBehaviour
             Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
          }
 
-         Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
+         Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
       }
    }
 
@@ -111,12 +125,12 @@ public class GameManager : MonoBehaviour
    {
       if (selectedBuilding != null && selectedBuilding.Upgrades.Contains(upgrade))
       {
-         if (Helper.GetGameStats().GetCurrentMoney() >= new BigInteger(upgrade.Cost) && selectedBuilding.BuildingLevel >= upgrade.RequiredLevel)
+         if (GameStats.Instance.GetCurrentMoney() >= new BigInteger(upgrade.Cost) && selectedBuilding.BuildingLevel >= upgrade.RequiredLevel)
          {
             // Activate upgrade
             if (selectedBuilding.ActivateUpgrade(upgrade))
             {
-               Helper.GetGameStats().SpendMoney(new BigInteger(upgrade.Cost));
+                    GameStats.Instance.SpendMoney(new BigInteger(upgrade.Cost));
 
                Helper.GetGUIManager().BuildingMode_SetBuildingInfo(selectedBuilding);
                if (upgradeBy != 1)
@@ -124,7 +138,7 @@ public class GameManager : MonoBehaviour
                   Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
                }
 
-               Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
+               Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
             }
          }
       }

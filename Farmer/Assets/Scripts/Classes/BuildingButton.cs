@@ -24,7 +24,7 @@ public class BuildingButton : MonoBehaviour
         {
 			buildingScript.InitializeBase();
 
-            BigInteger currentMoney = Helper.GetGameStats().GetCurrentMoney();
+            BigInteger currentMoney = GameStats.Instance.GetCurrentMoney();
             BigInteger cost = buildingScript.GetCost();
 
             if (currentMoney >= cost)

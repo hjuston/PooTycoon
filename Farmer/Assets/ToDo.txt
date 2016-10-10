@@ -1,33 +1,33 @@
-[Bonus za obejrzenie reklamy - "udro¿nienie systemu kanalizacji" - totalIncome x2 przez 2 godziny]
-[Bonus za obejrzenie reklamy - X punktów premium]
+ï»¿[Bonus za obejrzenie reklamy - "udroÅ¼nienie systemu kanalizacji" - totalIncome x2 przez 2 godziny]
+[Bonus za obejrzenie reklamy - X punktÃ³w premium]
 
 Struktura
 
-[Miasto] (Prestige - zwiêksza iloœæ turystów (prestige zdobywa siê przez budowle typu hotel, kino, centrum handlowe))
-	Desc: Prestige zwiêksza iloœæ turystów. Zdobywa siê go poprzez budowle turystyczne typu hotel, kino, centrum handlowe.
-		  Iloœæ turystów to dodatkowy mno¿nik sh/s.
+[Miasto] (Prestige - zwiÄ™ksza iloÅ›Ä‡ turystÃ³w (prestige zdobywa siÄ™ przez budowle typu hotel, kino, centrum handlowe))
+	Desc: Prestige zwiÄ™ksza iloÅ›Ä‡ turystÃ³w. Zdobywa siÄ™ go poprzez budowle turystyczne typu hotel, kino, centrum handlowe.
+		  IloÅ›Ä‡ turystÃ³w to dodatkowy mnoÅ¼nik sh/s.
 
-	[Buildings] (Nazwa, Typ, iloœæ sh/s)
-		Desc: Budynki dziel¹ siê na 3 typy. 1 - Mieszkania (dom, blok itp.) 2 - Budynki turystyczne (kino, hotel...)
+	[Buildings] (Nazwa, Typ, iloÅ›Ä‡ sh/s)
+		Desc: Budynki dzielÄ… siÄ™ na 3 typy. 1 - Mieszkania (dom, blok itp.) 2 - Budynki turystyczne (kino, hotel...)
 			  3 - Budynki infrastruktury (Oczyszczalnia, ?)
 
 			  
-			- na poziomach 10, 25, 50, 75, 100 maj¹ ulepszenia (baseIncome)
-			- ka¿de ulepszenie budynku zwiêksza sh/s
-			- co 150 lvli odblokowuje siê nowy budynek i mo¿na przekszta³ciæ istniej¹cy w lepszy
+			- na poziomach 10, 25, 50, 75, 100 majÄ… ulepszenia (baseIncome)
+			- kaÅ¼de ulepszenie budynku zwiÄ™ksza sh/s
+			- co 150 lvli odblokowuje siÄ™ nowy budynek i moÅ¼na przeksztaÅ‚ciÄ‡ istniejÄ…cy w lepszy
 				np. Hut -> small house, hotel* -> hotel ** 
 
 Standard		
 	- Hut -> Small house -> Big house -> Apartment block -> Pension -> Villa -> Mansion -> Palace ->  Skyscraper
 
-** odblokowywanie po jakimœ czasie
+** odblokowywanie po jakimÅ› czasie
 Infrastruktura	
 	- Small factory -> Large factory -> Powerful factory -> Factory v2
 	- Sludgeworks H1Z1 -> Sludgeworks D2H1 -> Sludgeworks BU38 -> Sludgeworks ABC1 -> Sludgeworks C17
 	- Waterworks v1 -> Waterworks v2 -> Waterworks v3 -> Waterworks v4 -> Waterworks v4.5
 	- Cage -> Prison -> Political prison -> Military prison -> Modern prison
 
-** odblokowywane po jakimœ czasie (po infrastrukturze)
+** odblokowywane po jakimÅ› czasie (po infrastrukturze)
 Prestige		
 	- Hotel* -> Hotel** -> Hotel*** -> Hotel**** -> Hotel *****
 	- Car cinema -> Cinema building -> Modern cinema -> 
@@ -51,41 +51,42 @@ MENU
 
 
 TODO:
-2. Zaimplementowaæ typy budynków, a nastêpnie stworzyæ ich prefaby -- DOKOÑCZYC
+2. ZaimplementowaÄ‡ typy budynkÃ³w, a nastÄ™pnie stworzyÄ‡ ich prefaby -- DOKOÅƒCZYC
 
-3. Zaimplemenowaæ tryb Away.
-	- Zapisaæ czas zamkniêcia aplikacji
-	- Po ponownym uruchomieniu obliczyæ ró¿nicê czasu i na podstawie Income/s obliczyæ AwayIncome
+3. ZaimplemenowaÄ‡ tryb Away.
+	- ZapisaÄ‡ czas zamkniÄ™cia aplikacji
+	- Po ponownym uruchomieniu obliczyÄ‡ rÃ³Å¼nicÄ™ czasu i na podstawie Income/s obliczyÄ‡ AwayIncome
 
-4. Stworzyæ menu startowe gry ?
+4. StworzyÄ‡ menu startowe gry ?
 
-5. Stworzyæ menu opcji gry (dŸwiêk, credits, ?)
-	- w creditsach daæ informacje o autorach ikonek (licencja) lub stworzyæ w³asne ikonki
-   - dŸwiêk
+5. StworzyÄ‡ menu opcji gry (dÅºwiÄ™k, credits, ?)
+	- w creditsach daÄ‡ informacje o autorach ikonek (licencja) lub stworzyÄ‡ wÅ‚asne ikonki
+   - dÅºwiÄ™k
    - reset gry do zera
+   - przesuwanie budynkÃ³w (drag lub przyciski)
 
-6. Stworzyæ menu zakupów premium
-	- mo¿liwoœæ kupna Instant sh/s
-	- mo¿liwoœæ kupna Sh/s x2 Forever
+6. StworzyÄ‡ menu zakupÃ³w premium
+	- moÅ¼liwoÅ›Ä‡ kupna Instant sh/s
+	- moÅ¼liwoÅ›Ä‡ kupna Sh/s x2 Forever
 	- reset drzewka pasywek (level)
 	- instant reset
-	- mo¿liwoœæ zakupu punktów premium za gotówkê (PLN)
+	- moÅ¼liwoÅ›Ä‡ zakupu punktÃ³w premium za gotÃ³wkÄ™ (PLN)
 
-10. Dodaæ obrazki dla wszystkich budynków (do panelu z budowlami) -- DOKOÑCZYC
+10. DodaÄ‡ obrazki dla wszystkich budynkÃ³w (do panelu z budowlami) -- DOKOÅƒCZYC
 
 11. Ulepszenia
-	- dodaæ obrazki 
-	- dodaæ opisy
-	- dodaæ nazwy (wymyœliæ coœ)
-	- dodaæ inne typy ulepszeñ
+	- dodaÄ‡ obrazki 
+	- dodaÄ‡ opisy
+	- dodaÄ‡ nazwy (wymyÅ›liÄ‡ coÅ›)
+	- dodaÄ‡ inne typy ulepszeÅ„
 
-12. Dodaæ resety
+12. DodaÄ‡ resety
 
-13. Balans budynków
-	- dodaæ koszta
-	- dodaæ przychody
+13. Balans budynkÃ³w
+	- dodaÄ‡ koszta
+	- dodaÄ‡ przychody
 
-14. Dodaæ klasê, która zlicza staty
+14. DodaÄ‡ klasÄ™, ktÃ³ra zlicza staty
 	- Lifetime cash
 	- current reset cash
 	- buildings bought
@@ -96,17 +97,27 @@ TODO:
 	- lifetime - hut levels, small house levels, etc...
 	- current reset - hut levels, small house levels
 
-15. Na podstawie klasy zliczaj¹cej staty dodaæ odblokowywanie budynków 
-	- np. small house od 50 lvli Hut (³¹cznie), BigHouse od 40 lvli SmallHouse (³¹cznie)
-	- wyœwietlaæ informacje w panelu budynków
-	- dodaæ aktywne/nieaktywne panele budynków
+15. Na podstawie klasy zliczajÄ…cej staty dodaÄ‡ odblokowywanie budynkÃ³w 
+	- np. small house od 50 lvli Hut (Å‚Ä…cznie), BigHouse od 40 lvli SmallHouse (Å‚Ä…cznie)
+	- wyÅ›wietlaÄ‡ informacje w panelu budynkÃ³w
+	- dodaÄ‡ aktywne/nieaktywne panele budynkÃ³w
 
-- - - 17. Poprawiæ wygl¹d menu do pozycjonowania budynku
+- - - 17. PoprawiÄ‡ wyglÄ…d menu do pozycjonowania budynku
 
-19. Dodaæ system zakupów za punkty premium
+19. DodaÄ‡ system zakupÃ³w za punkty premium
 
 20. LEVEL
-	- dodaæ drzewko umiejêtnoœæi pasywnych (np. total income + 10%, prestige income + 5%)
-	- w drzewku mo¿na odblokowywaæ budowle?
+	- dodaÄ‡ drzewko umiejÄ™tnoÅ›Ä‡i pasywnych (np. total income + 10%, prestige income + 5%)
+	- w drzewku moÅ¼na odblokowywaÄ‡ budowle?
 
-21. Dodaæ zapamiêtywanie ustawieñ - budynków, opcji, statystyk po zamkniêciu gry
+21. DodaÄ‡ zapamiÄ™tywanie ustawieÅ„ - budynkÃ³w, opcji, statystyk po zamkniÄ™ciu gry
+
+23. Obracanie budynku - ustabilizowaï¿½ go?
+
+24. Zmiana koloru budynku przy stawianiu (czerwony jak nie mozna, zielony jak mozna, przy ghoscie dac transparenta)
+
+26. Stawianie budynkï¿½w poza miastem - naprawiï¿½
+
+27. Kamera - nie moï¿½e wyjeï¿½dï¿½aï¿½ poza miasto w nieskoï¿½czonoï¿½ï¿½ - daï¿½ ï¿½ciï¿½ganie jej na teren
+
+28. Poruszanie budynkiem drag&drop

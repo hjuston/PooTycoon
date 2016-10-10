@@ -23,8 +23,8 @@ public class GhostScript : MonoBehaviour
 
 	public void Rotate()
 	{
-		transform.Rotate(new Vector3(0f, 90, 0f));
-		SnapToGrid(transform.position);
+        transform.Rotate(new Vector3(0, 90f, 0));
+        SnapToGrid(transform.position);
 	}
 
 	private void CenterOfScreen()
@@ -35,7 +35,7 @@ public class GhostScript : MonoBehaviour
 		if (Physics.Raycast(ray, out hitInfo))
 		{
 			SnapToGrid(hitInfo.point);
-		}
+        }
 	}
 
 	private void SnapToGrid(Vector3 position)
@@ -115,4 +115,35 @@ public class GhostScript : MonoBehaviour
 			}
 		}
 	}
+
+
+    bool drag = false;
+    void OnMouseDown()
+    {
+        if (!Helper.IsPointerAboveGUI() && Helper.GetGridManager().GhostObject != null)
+        {
+            drag = true;
+        }
+    }
+
+    void OnMouseUp()
+    {
+        drag = false;
+    }
+
+    void OnMouseDrag()
+    {
+        if(drag)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+
+
+            if(Physics.Raycast(ray, out hitInfo))
+            {
+                transform.position = new Vector3(hitInfo.point.x, 0.5f, hitInfo.point.z);
+                SnapToGrid(transform.position);
+            }
+        }
+    }
 }

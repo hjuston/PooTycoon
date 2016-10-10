@@ -31,7 +31,7 @@ public class EditMode_BuildingInfoPanelScript : MonoBehaviour
         Building buildingScript = buildingPrefab.GetComponent<Building>();
         if(buildingScript != null)
         {
-            if(Helper.GetGameStats().GetCurrentMoney() >= buildingScript.GetCost())
+            if(GameStats.Instance.GetCurrentMoney() >= buildingScript.GetCost())
             {
                 Helper.GetGridManager().SpawnGhostObject(buildingPrefab);
                 Helper.GetGUIManager().EditMode_HideBuildingsPanel();

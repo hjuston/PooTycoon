@@ -4,123 +4,126 @@ using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour
 {
-	// Ghost object i jego materiał
-	private GameObject _ghostObject;
-	private GameObject GhostObject
-	{
-		get { return _ghostObject; }
-		set { _ghostObject = value; }
-	}
+    // Ghost object i jego materiał
+    private GameObject _ghostObject;
+    public GameObject GhostObject
+    {
+        get { return _ghostObject; }
+        set { _ghostObject = value; }
+    }
 
-	// Przycisk potwierdzenia do postawienia budynku
-	public GameObject GhostFollowingButton;
-
-	void Update()
-	{
-		// Sprawdzanie czy w editMode został kliknięty budynek - jeżeli tak to ustawia go jako tymczasowego ghostmode
-		// można go wtedy przenieść lub sprzedać
-		if (Helper.GetGameManager().IsEditMode())
-		{
-         if(Input.touchCount > 0)
-         {
-            if(Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
+    // Przycisk potwierdzenia do postawienia budynku
+    public GameObject GhostFollowingButton;
+    void Update()
+    {
+        // Sprawdzanie czy w editMode został kliknięty budynek - jeżeli tak to ustawia go jako tymczasowego ghostmode
+        // można go wtedy przenieść lub sprzedać
+        if (Helper.GetGameManager().IsEditMode())
+        {
+            if (Input.GetMouseButtonDown(0) && !Helper.IsPointerAboveGUI())//(Input.touchCount > 0)
             {
-               RaycastHit hitInfo;
-               Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+                //if(Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
+                //{
+                RaycastHit hitInfo;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);//Input.GetTouch(0).position);
 
-               if (Physics.Raycast(ray, out hitInfo))
-               {
-                  if (hitInfo.collider.tag == CONSTS.BuildingTag && GhostObject == null)
-                  {
-                     GhostObject = hitInfo.collider.gameObject;
-                     ActivateGhostObject();
-                  }
-               }
+                if (Physics.Raycast(ray, out hitInfo))
+                {
+                    if (hitInfo.collider.tag == CONSTS.BuildingTag)
+                    {
+                        if (GhostObject == null)
+                        {
+                            GhostObject = hitInfo.collider.gameObject;
+                            ActivateGhostObject();
+                        }
+                    }
+                }
             }
-         }
-		}
-	}
+            
+            //}
+        }
+    }
 
-	/// <summary>
-	/// Metoda tworzy obiekt Ghost
-	/// </summary>
-	public void SpawnGhostObject(GameObject prefab)
-	{
-		if (GhostObject == null)
-		{
-			GhostObject = GameObject.Instantiate<GameObject>(prefab);
-			ActivateGhostObject();
-		}
-	}
+    /// <summary>
+    /// Metoda tworzy obiekt Ghost
+    /// </summary>
+    public void SpawnGhostObject(GameObject prefab)
+    {
+        if (GhostObject == null)
+        {
+            GhostObject = GameObject.Instantiate<GameObject>(prefab);
+            ActivateGhostObject();
+        }
+    }
 
     Vector3 ghostOriginalPosition;
-	private void ActivateGhostObject()
-	{
-		// Activate following button to move object
-		GhostFollowingButton.SetActive(true);
-		GhostFollowingButtonScript ghostFollowScript = GhostFollowingButton.GetComponent<GhostFollowingButtonScript>();
-		ghostFollowScript.SetGhostObject(GhostObject);
+    private void ActivateGhostObject()
+    {
+        // Activate following button to move object
+        GhostFollowingButton.SetActive(true);
+        GhostFollowingButtonScript ghostFollowScript = GhostFollowingButton.GetComponent<GhostFollowingButtonScript>();
+        ghostFollowScript.SetGhostObject(GhostObject);
 
-		GhostScript ghostScript = GhostObject.GetComponent<GhostScript>();
-		ghostScript.isGhost = true;
+        GhostScript ghostScript = GhostObject.GetComponent<GhostScript>();
+        ghostScript.isGhost = true;
 
         // Zapamiętywanie pozycji w razie anulowania
         Building buildingScript = GhostObject.GetComponent<Building>();
-        if(buildingScript.IsPlacedForReal)
+        if (buildingScript.IsPlacedForReal)
         {
             ghostOriginalPosition = GhostObject.transform.position;
         }
 
         Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(true);
-	}
+    }
 
-	/// <summary>
-	/// Zamienia obiekt Ghost na budynek
-	/// </summary>
-	public void DropObject()
-	{
-		GhostScript ghost = GhostObject.GetComponent<GhostScript>();
-		if (ghost.canPlace)
-		{
-			// Place object
-			ghost.isGhost = false;
+    /// <summary>
+    /// Zamienia obiekt Ghost na budynek
+    /// </summary>
+    public void DropObject()
+    {
+        GhostScript ghost = GhostObject.GetComponent<GhostScript>();
+        if (ghost.canPlace)
+        {
+            // Place object
+            ghost.isGhost = false;
 
-			// Hide following button to place button
-			GhostFollowingButtonScript ghostFollowScript = GhostFollowingButton.GetComponent<GhostFollowingButtonScript>();
-			ghostFollowScript.UnsetGhostObject();
-			GhostFollowingButton.SetActive(false);
+            // Hide following button to place button
+            GhostFollowingButtonScript ghostFollowScript = GhostFollowingButton.GetComponent<GhostFollowingButtonScript>();
+            ghostFollowScript.UnsetGhostObject();
+            GhostFollowingButton.SetActive(false);
 
-			// Ustawianie budynku jako child grupy budynków
-			GhostObject.transform.SetParent(Helper.GetBuildingsGroup().transform);
+            // Ustawianie budynku jako child grupy budynków
+            GhostObject.transform.SetParent(Helper.GetBuildingsGroup().transform);
 
-			// Informowanie budowli, że została wybudowana
-			Building buildingScript = GhostObject.GetComponent<Building>();
-			if (buildingScript != null)
-			{
-				if(!buildingScript.IsPlacedForReal)
-				{
-					buildingScript.IsPlacedForReal = true;
-					
-					// Wydanie pieniędzy
-					Helper.GetGameStats().SpendMoney(buildingScript.GetCost());
-                    Helper.GetGameStats().AddExperience(buildingScript.BuildingBuyExperience);
-				}
-			}
+            // Informowanie budowli, że została wybudowana
+            Building buildingScript = GhostObject.GetComponent<Building>();
+            if (buildingScript != null)
+            {
+                if (!buildingScript.IsPlacedForReal)
+                {
+                    buildingScript.IsPlacedForReal = true;
 
-			GhostObject = null;
+                    // Wydanie pieniędzy
+                    GameStats.Instance.SpendMoney(buildingScript.GetCost());
+                    GameStats.Instance.AddExperience(buildingScript.BuildingBuyExperience);
+                }
+            }
+
+            GhostObject = null;
             Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(false);
-            Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
+            Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
         }
-	}
+    }
 
-	/// <summary>
-	/// Metoda powoduje anulowanie stawiania lub sprzedania budynku
-	/// </summary>
-	public void CancelGhost()
-	{
-		GhostFollowingButtonScript ghostFollowScript = GhostFollowingButton.GetComponent<GhostFollowingButtonScript>();
-		ghostFollowScript.UnsetGhostObject();
-		GhostFollowingButton.SetActive(false);
+    /// <summary>
+    /// Metoda powoduje anulowanie stawiania lub sprzedania budynku
+    /// </summary>
+    public void CancelGhost()
+    {
+        GhostFollowingButtonScript ghostFollowScript = GhostFollowingButton.GetComponent<GhostFollowingButtonScript>();
+        ghostFollowScript.UnsetGhostObject();
+        GhostFollowingButton.SetActive(false);
 
         if (GhostObject == null) return;
 
@@ -139,7 +142,7 @@ public class GridManager : MonoBehaviour
 
         Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(false);
         GhostObject = null;
-	}
+    }
 
 
     /// <summary>
@@ -156,37 +159,37 @@ public class GridManager : MonoBehaviour
         {
             if (buildingScript.IsPlacedForReal)
             {
-                Helper.GetGameStats().AddMoney(buildingScript.GetSellPrice());
+                GameStats.Instance.AddMoney(buildingScript.GetSellPrice());
             }
         }
 
         Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(false);
-        Helper.GetGUIManager().GameStats_SetIncomeInfo(Helper.GetGameStats().GetCurrentIncome());
+        Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
         GameObject.Destroy(GhostObject);
         GhostObject = null;
     }
 
-	public void RotateGhost()
-	{
-		if (GhostObject != null)
-		{
-			GhostScript ghostScript = GhostObject.GetComponent<GhostScript>();
-			ghostScript.Rotate();
-		}
-	}
+    public void RotateGhost()
+    {
+        if (GhostObject != null)
+        {
+            GhostScript ghostScript = GhostObject.GetComponent<GhostScript>();
+            ghostScript.Rotate();
+        }
+    }
 
-	// Poruszanie obiektem Ghost
-	private void GhostMove(float up, float down, float left, float right)
-	{
-		if (GhostObject != null)
-		{
-			GhostScript ghostScript = GhostObject.GetComponent<GhostScript>();
-			ghostScript.MoveGhost(up, down, left, right);
-		}
-	}
+    // Poruszanie obiektem Ghost
+    private void GhostMove(float up, float down, float left, float right)
+    {
+        if (GhostObject != null)
+        {
+            GhostScript ghostScript = GhostObject.GetComponent<GhostScript>();
+            ghostScript.MoveGhost(up, down, left, right);
+        }
+    }
 
-	public void GhostMoveUp() { GhostMove(1, 0, 0, 0); }
-	public void GhostMoveDown() { GhostMove(0, 1, 0, 0); }
-	public void GhostMoveLeft() { GhostMove(0, 0, 1, 0); }
-	public void GhostMoveRight() { GhostMove(0, 0, 0, 1); }
+    public void GhostMoveUp() { GhostMove(1, 0, 0, 0); }
+    public void GhostMoveDown() { GhostMove(0, 1, 0, 0); }
+    public void GhostMoveLeft() { GhostMove(0, 0, 1, 0); }
+    public void GhostMoveRight() { GhostMove(0, 0, 0, 1); }
 }

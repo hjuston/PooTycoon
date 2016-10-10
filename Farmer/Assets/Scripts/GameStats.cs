@@ -1,115 +1,182 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Collections.Generic;
 
-public class GameStats : MonoBehaviour
+[Serializable]
+public class GameStats
 {
-   private BigInteger _currentMoney = new BigInteger("123123331");
+    private BigInteger _currentMoney = new BigInteger("100000");
 
-   private int _level = 1;
-   private int _requiredExperience = 100;
-   private int _currentExperience = 0;
+    private int _level = 1;
+    private int _requiredExperience = 100;
+    private int _currentExperience = 0;
 
-   private int Level
-   {
-      get { return _level; }
-      set { _level = value; Helper.GetGUIManager().GameStats_SetLevelText(value); }
-   }
-
-   private int RequiredExperience
-   {
-      get { return _requiredExperience; }
-      set { _requiredExperience = value; Helper.GetGUIManager().GameStats_SetExperienceValue(_currentExperience, value);
+    private int Level
+    {
+        get { return _level; }
+        set { _level = value; Helper.GetGUIManager().GameStats_SetLevelText(value); }
+    }
+    private int RequiredExperience
+    {
+        get { return _requiredExperience; }
+        set
+        {
+            _requiredExperience = value; Helper.GetGUIManager().GameStats_SetExperienceValue(_currentExperience, value);
             Helper.GetGUIManager().GameStats_SetExperienceBarValue((float)_currentExperience / (float)_requiredExperience);
-         }
-   }
-
-   private int CurrentExperience
-   {
-      get { return _currentExperience; }
-      set { _currentExperience = value; Helper.GetGUIManager().GameStats_SetExperienceValue(value, _requiredExperience);
+        }
+    }
+    private int CurrentExperience
+    {
+        get { return _currentExperience; }
+        set
+        {
+            _currentExperience = value; Helper.GetGUIManager().GameStats_SetExperienceValue(value, _requiredExperience);
             Helper.GetGUIManager().GameStats_SetExperienceBarValue((float)_currentExperience / (float)_requiredExperience);
-         }
-   }
-
-   private BigInteger CurrentMoney
-   {
-      get { return _currentMoney; }
-      set {
+        }
+    }
+    private BigInteger CurrentMoney
+    {
+        get { return _currentMoney; }
+        set
+        {
             _currentMoney = value;
 
             // Listenery
             Helper.GetGUIManager().GameStats_SetCurrentMoneyInfo(value);
             Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(Helper.GetGameManager().GetCurrentlySelectedBuilding(), Helper.GetGameManager().GetUpgradeByValue());
-          }
-   }
+        }
+    }
 
-   void Start()
-   {
-      InvokeRepeating("CollectMoney", 0f, 1f);
-   }
+    public SerializableBuilding[] Buildings;
 
-   #region ** Cash
-   /// <summary>
-   /// Metoda zwiększa ilość gotówki (np. w przypadku sprzedania budynku)
-   /// </summary>
-   /// <param name="money"></param>
-   public void AddMoney(BigInteger money)
-   {
-      CurrentMoney += money;
-   }
 
-   /// <summary>
-   /// Metoda zlicza przychody z budynków i dodaje je do aktualnej gotówki
-   /// </summary>
-   void CollectMoney()
-   {
-      // Zliczanie gotówki jeżeli gra nie jest w trybie edycji budowli
-      if (!Helper.GetGameManager().IsEditMode())
-      {
-         CurrentMoney += GetCurrentIncome();
-      }
-   }
+    public void LoadBuildingsToProperty()
+    {
+        List<SerializableBuilding> list = new List<SerializableBuilding>();
+        foreach (Transform transform in Helper.GetBuildingsGroup().transform)
+        {
+            Building building = transform.gameObject.GetComponent<Building>();
+            if(building != null)
+            {
+                list.Add(new SerializableBuilding(building, transform.position, transform.localRotation));
+            }
+        }
 
-   public BigInteger GetCurrentIncome()
-   {
-      BigInteger income = new BigInteger("0");
+        Buildings = list.ToArray();
+    }
 
-      GameObject buildingGroup = GameObject.FindGameObjectWithTag(CONSTS.BuildingsGroupTag);
-      if (buildingGroup != null)
-      {
-         Building[] buildings = buildingGroup.GetComponentsInChildren<Building>();
+    public void LoadBuildingToWorld()
+    {
+        if (Buildings != null)
+        {
+            foreach (SerializableBuilding serBuilding in Buildings)
+            {
+                GameObject[] buildings = BuildingsDatabase.GetBuildingsByType(serBuilding.Building.BuildingType);
+                foreach(GameObject building in buildings)
+                {
+                    Building script = building.GetComponent<Building>();
+                    if(script != null)
+                    {
+                        if (script.Name == serBuilding.Building.Name)
+                        {
+                            // Znaleziono budynek
+                            GameObject objInst = GameObject.Instantiate(building);
+                            objInst.transform.SetParent(Helper.GetBuildingsGroup().transform, true);
 
-         foreach (Building building in buildings)
-         {
-            income += building.GetIncome();
-         }
-      }
+                            objInst.transform.position = new Vector3(serBuilding.PositionX, serBuilding.PositionY, serBuilding.PositionZ);
 
-      return income;
-   }
+                        }
+                    }
+                }
 
-   /// <summary>
-   /// Metoda zwraca aktualną ilość gotówki.
-   /// </summary>
-   /// <returns></returns>
-   public BigInteger GetCurrentMoney()
-   {
-      return CurrentMoney;
-   }
+            }
+        }
+    }
 
-   /// <summary>
-   /// Metoda zmniejsza ilosć gotówki
-   /// </summary>
-   /// <returns></returns>
-   public void SpendMoney(BigInteger money)
-   {
-      CurrentMoney -= money;
-   }
-   #endregion
+    static GameStats _instance;
+    public static GameStats Instance
+    {
+        get
+        {
+            if (_instance == null) _instance = new GameStats();
+            return _instance;
+        }
+        set
+        {
+            _instance = value;
+            Helper.GetGUIManager().GameStats_SetLevelText(value.Level);
+            Helper.GetGUIManager().GameStats_SetCurrentMoneyInfo(value.CurrentMoney);
+            Helper.GetGUIManager().GameStats_SetExperienceValue(value.CurrentExperience, value.RequiredExperience);
+            Helper.GetGUIManager().GameStats_SetExperienceBarValue((float)value.CurrentExperience / (float)value.RequiredExperience);
+            Helper.GetGUIManager().GameStats_SetIncomeInfo(value.GetCurrentIncome());
+        }
+    }
 
-   #region ** Level
-   public void AddExperience(int experience)
-	{
+    #region ** Cash
+    /// <summary>
+    /// Metoda zwiększa ilość gotówki (np. w przypadku sprzedania budynku)
+    /// </summary>
+    /// <param name="money"></param>
+    public void AddMoney(BigInteger money)
+    {
+        CurrentMoney += money;
+    }
+
+    /// <summary>
+    /// Metoda zlicza przychody z budynków i dodaje je do aktualnej gotówki
+    /// </summary>
+    public void CollectMoney()
+    {
+        // Zliczanie gotówki jeżeli gra nie jest w trybie edycji budowli
+        if (!Helper.GetGameManager().IsEditMode())
+        {
+            CurrentMoney += GetCurrentIncome();
+        }
+    }
+
+    public BigInteger GetCurrentIncome()
+    {
+        BigInteger income = new BigInteger("0");
+
+        GameObject buildingGroup = GameObject.FindGameObjectWithTag(CONSTS.BuildingsGroupTag);
+        if (buildingGroup != null)
+        {
+            Building[] buildings = buildingGroup.GetComponentsInChildren<Building>();
+
+            foreach (Building building in buildings)
+            {
+                income += building.GetIncome();
+            }
+        }
+
+        return income;
+    }
+
+    /// <summary>
+    /// Metoda zwraca aktualną ilość gotówki.
+    /// </summary>
+    /// <returns></returns>
+    public BigInteger GetCurrentMoney()
+    {
+        return CurrentMoney;
+    }
+
+    /// <summary>
+    /// Metoda zmniejsza ilosć gotówki
+    /// </summary>
+    /// <returns></returns>
+    public void SpendMoney(BigInteger money)
+    {
+        CurrentMoney -= money;
+    }
+    #endregion
+
+    #region ** Level
+    public void AddExperience(int experience)
+    {
         while (experience > 0)
         {
             if (CurrentExperience + experience >= RequiredExperience)
@@ -126,6 +193,14 @@ public class GameStats : MonoBehaviour
                 experience = 0;
             }
         }
-	}
-   #endregion
+    }
+
+    public void SetStats(GameStats stats)
+    {
+        _currentExperience = stats.CurrentExperience;
+        _currentMoney = stats.CurrentMoney;
+        _level = stats.Level;
+        _requiredExperience = stats.RequiredExperience;
+    }
+    #endregion
 }
