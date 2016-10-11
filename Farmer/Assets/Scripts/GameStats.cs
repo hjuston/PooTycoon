@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
-using System.IO;
-using System.Runtime.Serialization;
+using System.Linq;
 using System.Collections.Generic;
 
 [Serializable]
@@ -14,12 +12,12 @@ public class GameStats
     private int _requiredExperience = 100;
     private int _currentExperience = 0;
 
-    private int Level
+    public int Level
     {
         get { return _level; }
         set { _level = value; Helper.GetGUIManager().GameStats_SetLevelText(value); }
     }
-    private int RequiredExperience
+    public int RequiredExperience
     {
         get { return _requiredExperience; }
         set
@@ -28,7 +26,7 @@ public class GameStats
             Helper.GetGUIManager().GameStats_SetExperienceBarValue((float)_currentExperience / (float)_requiredExperience);
         }
     }
-    private int CurrentExperience
+    public int CurrentExperience
     {
         get { return _currentExperience; }
         set
@@ -37,7 +35,7 @@ public class GameStats
             Helper.GetGUIManager().GameStats_SetExperienceBarValue((float)_currentExperience / (float)_requiredExperience);
         }
     }
-    private BigInteger CurrentMoney
+    public BigInteger CurrentMoney
     {
         get { return _currentMoney; }
         set
@@ -49,52 +47,53 @@ public class GameStats
             Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(Helper.GetGameManager().GetCurrentlySelectedBuilding(), Helper.GetGameManager().GetUpgradeByValue());
         }
     }
+    
+    //public void LoadBuildingToWorld()
+    //{
+    //    if (Buildings != null)
+    //    {
+    //        foreach (SerializableBuilding serBuilding in Buildings)
+    //        {
+    //            GameObject[] buildings = BuildingsDatabase.GetBuildingsByType(serBuilding.BuildingType);
+    //            foreach(GameObject building in buildings)
+    //            {
+    //                Building script = building.GetComponent<Building>();
+    //                if(script != null)
+    //                {
+    //                    if (script.Name == serBuilding.BuildingName)
+    //                    {
+    //                        // Znaleziono budynek
+    //                        GameObject objInst = GameObject.Instantiate(building);
+    //                        objInst.transform.SetParent(Helper.GetBuildingsGroup().transform, true);
 
-    public SerializableBuilding[] Buildings;
+    //                        objInst.transform.position = new Vector3(serBuilding.PositionX, serBuilding.PositionY, serBuilding.PositionZ);
+    //                        objInst.transform.localRotation = new Quaternion(serBuilding.RotationX, serBuilding.RotationY, serBuilding.RotationZ, serBuilding.RotationW);
 
+    //                        Building objectsScript = objInst.GetComponent<Building>();
+    //                        if (objectsScript != null)
+    //                        {
+    //                            objectsScript.BuildingLevel = serBuilding.BuildingLevel;
+    //                            objectsScript.IsPlacedForReal = serBuilding.IsPlacedForReal;
 
-    public void LoadBuildingsToProperty()
-    {
-        List<SerializableBuilding> list = new List<SerializableBuilding>();
-        foreach (Transform transform in Helper.GetBuildingsGroup().transform)
-        {
-            Building building = transform.gameObject.GetComponent<Building>();
-            if(building != null)
-            {
-                list.Add(new SerializableBuilding(building, transform.position, transform.localRotation));
-            }
-        }
+    //                            if (objectsScript.Upgrades != null)
+    //                            {
+    //                                foreach (Upgrade up in objectsScript.Upgrades)
+    //                                {
+    //                                    SerializableUpgrade serializableUp = serBuilding.Upgrades.FirstOrDefault(x => x.Name == up.Name);
+    //                                    if (serializableUp != null)
+    //                                    {
+    //                                        up.HasBeenBought = serializableUp.HasBeenBought;
+    //                                    }
+    //                                }
+    //                            }
+    //                        }
+    //                    }
+    //                }
+    //            }
 
-        Buildings = list.ToArray();
-    }
-
-    public void LoadBuildingToWorld()
-    {
-        if (Buildings != null)
-        {
-            foreach (SerializableBuilding serBuilding in Buildings)
-            {
-                GameObject[] buildings = BuildingsDatabase.GetBuildingsByType(serBuilding.Building.BuildingType);
-                foreach(GameObject building in buildings)
-                {
-                    Building script = building.GetComponent<Building>();
-                    if(script != null)
-                    {
-                        if (script.Name == serBuilding.Building.Name)
-                        {
-                            // Znaleziono budynek
-                            GameObject objInst = GameObject.Instantiate(building);
-                            objInst.transform.SetParent(Helper.GetBuildingsGroup().transform, true);
-
-                            objInst.transform.position = new Vector3(serBuilding.PositionX, serBuilding.PositionY, serBuilding.PositionZ);
-
-                        }
-                    }
-                }
-
-            }
-        }
-    }
+    //        }
+    //    }
+    //}
 
     static GameStats _instance;
     public static GameStats Instance

@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 [Serializable]
-public class SerializableBuilding : MonoBehaviour
+public class SerializableBuilding
 {
-    public Building Building;
+    //public Building Building;
 
     public float PositionX;
     public float PositionY;
@@ -15,11 +17,15 @@ public class SerializableBuilding : MonoBehaviour
     public float RotationY;
     public float RotationZ;
     public float RotationW;
+    
+    public int BuildingLevel;
+    public SerializableUpgrade[] Upgrades;
+    public bool IsPlacedForReal = false;
+    public BuildingType BuildingType;
+    public string BuildingName;
 
     public SerializableBuilding(Building building, Vector3 position, Quaternion rotation)
     {
-        Building = building;
-
         PositionX = position.x;
         PositionY = position.y;
         PositionZ = position.z;
@@ -28,5 +34,21 @@ public class SerializableBuilding : MonoBehaviour
         RotationY = rotation.y;
         RotationZ = rotation.z;
         RotationW = rotation.w;
+
+
+        BuildingLevel = building.BuildingLevel;
+
+        // Zapisywanie upgradeów
+        List<SerializableUpgrade> temp = new List<SerializableUpgrade>();
+        foreach(Upgrade upgrade in building.Upgrades)
+        {
+            temp.Add(new SerializableUpgrade() { Name = upgrade.Name, HasBeenBought = upgrade.HasBeenBought });
+        }
+        Upgrades = temp.ToArray();
+
+
+        IsPlacedForReal = building.IsPlacedForReal;
+        BuildingType = building.BuildingType;
+        BuildingName = building.Name;
     }
 }

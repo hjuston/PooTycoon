@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 [Serializable]
-public class Building : MonoBehaviour {
+public class Building : MonoBehaviour
+{
 
     // Nazwa i typ
     public string Name;
@@ -45,11 +46,11 @@ public class Building : MonoBehaviour {
     // Prefaby budynku
     //public GameObject BuildingPrefab;
     public GameObject ButtonPrefab;
-    
+
     void Awake()
     {
         List<Upgrade> upgradesList = new List<Upgrade>();
-        foreach(Upgrade prefab in UpgradePrefabs)
+        foreach (Upgrade prefab in UpgradePrefabs)
         {
             upgradesList.Add(prefab.GetCopy());
         }
@@ -61,15 +62,15 @@ public class Building : MonoBehaviour {
         BaseIncome = new BigInteger(iBaseIncome);
         BaseCost = new BigInteger(iBaseCost);
     }
-    
+
     /// <summary>
     /// Metoda oblicza koszt budowli na podstawie poziomu ulepszenia
     /// </summary>
     /// <returns></returns>
     public BigInteger GetCost()
     {
-		// Wzór BaseCost * CostMultiplier ^ (BuildingLevel)
-		if (BaseCost == null || BaseCost == new BigInteger("0")) InitializeBase();
+        // Wzór BaseCost * CostMultiplier ^ (BuildingLevel)
+        if (BaseCost == null || BaseCost == new BigInteger("0")) InitializeBase();
 
         return SimulateCost(BuildingLevel);
     }
@@ -85,7 +86,7 @@ public class Building : MonoBehaviour {
     /// <returns></returns>
     public BigInteger GetIncome()
     {
-		if (BaseIncome == null) InitializeBase();
+        if (BaseIncome == null || BaseIncome == new BigInteger("0")) InitializeBase();
 
         // Wzór BaseIncome  * BuildingLevel
         return (BaseIncome * UpgradesBaseIncomeMultiplier) * new BigInteger(BuildingLevel);
@@ -122,7 +123,7 @@ public class Building : MonoBehaviour {
     {
         BigInteger result = new BigInteger("0");
 
-        for(int level = BuildingLevel; level < BuildingLevel + levels; level++)
+        for (int level = BuildingLevel; level < BuildingLevel + levels; level++)
         {
             BigInteger simulatedCost = SimulateCost(level);
             result += simulatedCost;
@@ -135,7 +136,7 @@ public class Building : MonoBehaviour {
     {
         bool result = false;
 
-        if(Upgrades.Contains(upgrade))
+        if (Upgrades.Contains(upgrade))
         {
             Upgrade buildingUpgrade = Upgrades.FirstOrDefault(x => x.Name == upgrade.Name);
             if (!buildingUpgrade.HasBeenBought)
@@ -150,5 +151,30 @@ public class Building : MonoBehaviour {
         }
 
         return result;
+    }
+
+    // System save-load
+    public void LoadBuilding(SerializableBuilding serializableBuilding)
+    {
+        // Ustawianie wartości pozycji i rotacji
+        transform.position = new Vector3(serializableBuilding.PositionX, serializableBuilding.PositionY, serializableBuilding.PositionZ);
+        transform.localRotation = new Quaternion(serializableBuilding.RotationX, serializableBuilding.RotationY, serializableBuilding.RotationZ, serializableBuilding.RotationW);
+
+        // Ustawianie wartości budynku
+        BuildingLevel = serializableBuilding.BuildingLevel;
+        IsPlacedForReal = serializableBuilding.IsPlacedForReal;
+
+        if (Upgrades != null)
+        {
+            foreach (Upgrade upgrade in Upgrades)
+            {
+                SerializableUpgrade serializableUp = serializableBuilding.Upgrades.FirstOrDefault(x => x.Name == upgrade.Name);
+                if (serializableUp != null)
+                {
+                    upgrade.HasBeenBought = serializableUp.HasBeenBought;
+                    ActivateUpgrade(upgrade);
+                }
+            }
+        }
     }
 }

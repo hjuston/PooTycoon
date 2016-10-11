@@ -110,7 +110,7 @@ TODO:
 	- dodać drzewko umiejętnośći pasywnych (np. total income + 10%, prestige income + 5%)
 	- w drzewku można odblokowywać budowle?
 
-21. Dodać zapamiętywanie ustawień - budynków, opcji, statystyk po zamknięciu gry
+*** 21. Dodać zapamiętywanie ustawień - budynków, opcji, statystyk po zamknięciu gry
 
 23. Obracanie budynku - ustabilizowa� go?
 
@@ -121,3 +121,26 @@ TODO:
 27. Kamera - nie mo�e wyje�d�a� poza miasto w niesko�czono�� - da� �ci�ganie jej na teren
 
 28. Poruszanie budynkiem drag&drop
+
+29. Zmienić mechanizmy
+	- Każdy budynek ma swoje życie
+		- produkcja shitu zajmuje ~10 sekund
+		- automatyczne zbieranie co 30 sekund (2-3x strata)
+		- możliwość ręcznego zbierania
+		- wskaźnik zapełnienia przy każdym budynku?
+		- automat za punkty premium zbierający odrazu z wszystkich budynków
+	- Ilość maksymalnej obróbki shitu przez oczyszczalnię
+		- jak wypuszczanie kurczaków
+		- każde zebranie odejmuje ilość
+		- ilość regeneruje się w czasie
+		- bonusy : szybsza regeneracja, zwiekszenie maksymalnej ilosci obrabianego shitu
+
+30. Kanaliza w budynku może się zapchać
+	- wyświetlić obrazek informujący o tym
+	- żeby naprawić trzeba kliknąć budynek i przycisk *Fix*
+	- Fix zajmuje jakiś czas np. 30 sekund
+		- czas fixa jest wpisany w budynku (im większy tym dłużej?)
+		- upgrade budynku lub pasywka skracająca czas fixa
+		- pasywka dająca multiplier do bonusu z fixa (np. +5% more bonus from fixing)
+	- działa jak drony w kurczokach
+	- za naprawienie daje hajs, punkty premium lub reklamę (która da więcej punktów premium)

@@ -24,16 +24,19 @@ public class GameManager : MonoBehaviour
    void Start()
    {
         // Wczytywanie bazy danych budynków
-
         BuildingsDatabase.LoadDatabase();
-        SaveManager.LoadData();
+
+        if(SaveManager.LoadData())
+        {
+            Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
+        }
 
         InvokeRepeating("CollectMoney", 0f, 1f);
    }
 
     void CollectMoney()
     {
-        
+        GameStats.Instance.CollectMoney();
     }
 
     void OnApplicationQuit()

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using System;
 
+[Serializable]
 public class Upgrade : ScriptableObject
 {
     [Header("Informations")]
@@ -29,5 +31,4 @@ public class Upgrade : ScriptableObject
 public enum UpgradeType
 {
     BaseIncomeMultiplier = 0,
-
 }

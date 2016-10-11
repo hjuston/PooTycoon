@@ -12,23 +12,28 @@ public class SaveManager : MonoBehaviour {
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + SaveName);
 
-        GameStats.Instance.LoadBuildingsToProperty();
+        bf.Serialize(file, new Game());
 
-        bf.Serialize(file, GameStats.Instance);
         file.Close();
     }
 
-    public static void LoadData()
+    public static bool LoadData()
     {
+        bool result = false;
+
         if (File.Exists(Application.persistentDataPath + SaveName))
         {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + SaveName, FileMode.Open);
-            GameStats.Instance = (GameStats)bf.Deserialize(file);
 
-            GameStats.Instance.LoadBuildingToWorld();
+            Game game = (Game)bf.Deserialize(file);
+            game.Load();
 
             file.Close();
+
+            result = true;
         }
+
+        return result;
     }
 }
