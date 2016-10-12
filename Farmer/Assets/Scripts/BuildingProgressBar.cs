@@ -1,17 +1,22 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class BuildingProgressBar : MonoBehaviour
 {
     public GameObject ProgressBar;
     public GameObject FullWarning;
+    public Text ValueText; 
 	
-    public void SetValue(float percentage)
+    public void SetValue(Building building)
     {
+        float percentage = (float)building.CurrentShits / (float)building.MaximumShits;
+
         if (percentage > 1f) percentage = 1f;
         if (percentage < 0f) percentage = 0f;
 
         ProgressBar.transform.localScale = new Vector3(percentage, ProgressBar.transform.localScale.y, ProgressBar.transform.localScale.z);
+        ValueText.text = Helper.GetDisplayableValue(building.CurrentValue());
 
         // Jeżeli progress bar jest pełny to wyświetla obrazek
         if (percentage == 1f)
@@ -47,8 +52,7 @@ public class BuildingProgressBar : MonoBehaviour
         Building buildingScript = building.GetComponent<Building>();
         if(buildingScript != null)
         {
-            float percentage = (float)buildingScript.CurrentShits / (float)buildingScript.MaximumShits;
-            SetValue(percentage);
+            SetValue(buildingScript);
         }
 
     }

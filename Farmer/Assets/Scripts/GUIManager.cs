@@ -327,10 +327,10 @@ public class GUIManager : MonoBehaviour
     /// <summary>
     /// Metoda ustawia wartość tekstu informującego o czasie pozostałym do 'zebrania' shitu przez oczyszczalnię
     /// </summary>
-    /// <param name="timeLeft"></param>
-    internal void BuildingMode_TimeToCollectShitUpdate(float timeLeft)
+    /// <param name="timeToCollect"></param>
+    internal void BuildingMode_TimeToCollectShitUpdate(float timeToCollect)
     {
-        BuildingMode_TimeToCollectShitText.text = string.Format("{0:0.##}", timeLeft);
+        BuildingMode_TimeToCollectShitText.text = string.Format("{0:0.0}", 30f - timeToCollect);
     }
 
     /// <summary>
@@ -419,7 +419,6 @@ public class GUIManager : MonoBehaviour
             }
         }
     }
-
     /// <summary>
     /// Metoda ukrywa/pokazuje menu z upgradeami budynku
     /// </summary>

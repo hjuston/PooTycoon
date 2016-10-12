@@ -39,7 +39,12 @@ public class GameManager : MonoBehaviour
 
     void CollectMoney()
     {
-        GameStats.Instance.CollectShit();
+        // Jeżeli jest zabrany to ustawia przełącznik na nie zebrany (żeby zablokować podwójny dostęp)
+        if (GameStats.Instance.ShitCollected)
+        {
+            GameStats.Instance.ShitCollected = false;
+            GameStats.Instance.CollectShit();
+        }
     }
 
     void OnApplicationQuit()
@@ -50,12 +55,8 @@ public class GameManager : MonoBehaviour
     public void DecreaseTimeToCollectShit()
     {
         TimeToCollectShit += 1f;
-
-        float timeLeft = 30f - TimeToCollectShit;
-
-        Helper.GetGUIManager().BuildingMode_TimeToCollectShitUpdate(timeLeft);
+        Helper.GetGUIManager().BuildingMode_TimeToCollectShitUpdate(TimeToCollectShit);
     }
-
 
     float TimeToCollectShit;
     void Update()
@@ -83,14 +84,14 @@ public class GameManager : MonoBehaviour
         if (TimeToCollectShit >= 30f)
         {
             // Jeżeli minął odpowiedni czas to zbiera
-            CollectMoney();
             TimeToCollectShit = 0f;
+            CollectMoney();
         }
         else
         {
             TimeToCollectShit += Time.deltaTime;
         }
-        Helper.GetGUIManager().BuildingMode_TimeToCollectShitUpdate(30f - TimeToCollectShit);
+        Helper.GetGUIManager().BuildingMode_TimeToCollectShitUpdate(TimeToCollectShit);
     }
 
     /// <summary>

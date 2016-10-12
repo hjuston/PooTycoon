@@ -32,10 +32,13 @@ public class Building : MonoBehaviour
     public float CostMultiplier;
 
     #region Generowanie
-    private float _shitValue = 1.0f;        // Wartość jednego G
-    private int _maximumShits = 10;         // Maksymalna ilosć G jaką może pomieścić budynek
-    private int _humansInBuilding = 1;      // Ilosć ludzi w budynku
-    private int _currentShits = 0;          // Aktualna ilość G
+    // BAD
+    public float _shitValue = 1.0f;              // Wartość jednego G
+    public int _maximumShits = 10;               // Maksymalna ilosć G jaką może pomieścić budynek
+    public int _humansInBuilding = 1;            // Ilosć ludzi w budynku
+    public int _currentShits = 0;                // Aktualna ilość G
+    [Range(1.07f, 1.15f)]
+    public float _shitValueMultiplier = 1.15f;   // Mnożnik wartości G zakres 
 
     public float ShitValue { get { return _shitValue; } set { _shitValue = value; } }   
     public int MaximumShits { get { return _maximumShits; } set { _maximumShits = value; } }
@@ -60,8 +63,7 @@ public class Building : MonoBehaviour
                 {
                     if(progressBarScript.GetCurrentlyFollowingBuilding() == gameObject)
                     {
-                        float percentage = (float)_currentShits / (float)_maximumShits;
-                        progressBarScript.SetValue(percentage);
+                        progressBarScript.SetValue(this);
                     }
                 }
              }
@@ -74,9 +76,34 @@ public class Building : MonoBehaviour
     /// <returns></returns>
     public BigInteger TakeShit()
     {
-        BigInteger toReturn = new BigInteger(_currentShits);
+        BigInteger toReturn = CurrentValue();
         _currentShits = 0;
+
+        // Aktualizacja wskaźnika zapełnienia - jeżeli jest on wyświetlony dla tego budynku
+        if (Helper.GetGUIManager().BuildingMode_BuildingProgressBar.activeInHierarchy)
+        {
+            BuildingProgressBar progressBarScript = Helper.GetGUIManager().BuildingMode_BuildingProgressBar.GetComponent<BuildingProgressBar>();
+            if (progressBarScript != null)
+            {
+                if (progressBarScript.GetCurrentlyFollowingBuilding() == gameObject)
+                {
+                    progressBarScript.SetValue(this);
+                }
+            }
+        }
+
         return toReturn;
+    }
+
+    /// <summary>
+    /// Metoda zwraca aktualną wartość jaką przechowuje budynek na podstawie poziomu budynku
+    /// i wartości pojedyńczego shitu
+    /// </summary>
+    /// <returns></returns>
+    public BigInteger CurrentValue()
+    {
+        float value = _currentShits * (_shitValue * Mathf.Pow((float)Math.Round(_shitValueMultiplier, 2) , (float)BuildingLevel));
+        return new BigInteger(Math.Round(value, 0).ToString());
     }
     #endregion
 
