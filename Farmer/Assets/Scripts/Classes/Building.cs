@@ -31,6 +31,61 @@ public class Building : MonoBehaviour
     // Mnożnik kosztów budynku (1.07 - 1.15)
     public float CostMultiplier;
 
+    #region Generowanie
+    private float _shitValue = 1.0f;        // Wartość jednego G
+    private int _maximumShits = 10;         // Maksymalna ilosć G jaką może pomieścić budynek
+    private int _humansInBuilding = 1;      // Ilosć ludzi w budynku
+    private int _currentShits = 0;          // Aktualna ilość G
+
+    public float ShitValue { get { return _shitValue; } set { _shitValue = value; } }   
+    public int MaximumShits { get { return _maximumShits; } set { _maximumShits = value; } }
+    public int HumansInBuilding { get { return _humansInBuilding; } set { _humansInBuilding = value; } }
+    public int CurrentShits { get { return _currentShits; } set { _currentShits = value; } }
+
+    /// <summary>
+    /// Metoda wywoływana co sekundę
+    /// </summary>
+    void GenerateShit()
+    {
+        // Jeżeli wartość nie przekroczyła maksymalnej dopuszczalnej to zwiększa licznik
+        if(CurrentShits < MaximumShits)
+        {
+            CurrentShits += HumansInBuilding;
+
+            // Aktualizacja wskaźnika zapełnienia - jeżeli jest on wyświetlony dla tego budynku
+             if(Helper.GetGUIManager().BuildingMode_BuildingProgressBar.activeInHierarchy)
+             {
+                BuildingProgressBar progressBarScript = Helper.GetGUIManager().BuildingMode_BuildingProgressBar.GetComponent<BuildingProgressBar>();
+                if (progressBarScript != null)
+                {
+                    if(progressBarScript.GetCurrentlyFollowingBuilding() == gameObject)
+                    {
+                        float percentage = (float)_currentShits / (float)_maximumShits;
+                        progressBarScript.SetValue(percentage);
+                    }
+                }
+             }
+        }
+    }
+
+    /// <summary>
+    /// Metoda powoduje 'zabranie' przez skrypt oczyszczalni G z danego budynku
+    /// </summary>
+    /// <returns></returns>
+    public BigInteger TakeShit()
+    {
+        BigInteger toReturn = new BigInteger(_currentShits);
+        _currentShits = 0;
+        return toReturn;
+    }
+    #endregion
+
+    void Start()
+    {
+        // Uruchomienie mechanizmu generującego G
+        InvokeRepeating("GenerateShit", 0f, 1.0f);
+    }
+
     // Lista ulepszeń budynku (aktywne i nieaktywne). Na jej podstawie zliczane są bonusy
     public Upgrade[] UpgradePrefabs; // -- prefaby
     float UpgradesBaseIncomeMultiplier = 1;
@@ -38,13 +93,11 @@ public class Building : MonoBehaviour
     [HideInInspector]
     public Upgrade[] Upgrades; // -- właściwa zmienna z upgradeami
 
-
     // Właściwość określa, czy budynek został postawiony za pomocą edytora.
     // Jeżeli tak to przy burzeniu należy zwrócić część kwoty.
     public bool IsPlacedForReal = false;
 
     // Prefaby budynku
-    //public GameObject BuildingPrefab;
     public GameObject ButtonPrefab;
 
     void Awake()
@@ -91,7 +144,6 @@ public class Building : MonoBehaviour
         // Wzór BaseIncome  * BuildingLevel
         return (BaseIncome * UpgradesBaseIncomeMultiplier) * new BigInteger(BuildingLevel);
     }
-
 
     /// <summary>
     /// Metoda oblicza kwotę, za którą można sprzedać budynek

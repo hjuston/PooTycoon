@@ -127,7 +127,7 @@ public class GameStats
     /// <summary>
     /// Metoda zlicza przychody z budynków i dodaje je do aktualnej gotówki
     /// </summary>
-    public void CollectMoney()
+    public void CollectShit()
     {
         // Zliczanie gotówki jeżeli gra nie jest w trybie edycji budowli
         if (!Helper.GetGameManager().IsEditMode())
@@ -140,14 +140,14 @@ public class GameStats
     {
         BigInteger income = new BigInteger("0");
 
-        GameObject buildingGroup = GameObject.FindGameObjectWithTag(CONSTS.BuildingsGroupTag);
+        GameObject buildingGroup = Helper.GetBuildingsGroup();
         if (buildingGroup != null)
         {
             Building[] buildings = buildingGroup.GetComponentsInChildren<Building>();
 
             foreach (Building building in buildings)
             {
-                income += building.GetIncome();
+                income += building.TakeShit(); //building.GetIncome();
             }
         }
 
