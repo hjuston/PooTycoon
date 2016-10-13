@@ -8,7 +8,6 @@ using System.Linq;
 [Serializable]
 public class Building : MonoBehaviour
 {
-
     // Nazwa i typ
     public string Name;
     public BuildingType BuildingType;
@@ -18,10 +17,7 @@ public class Building : MonoBehaviour
     // Poziom ulepszenia budynku
     public int BuildingLevel = 1;
 
-    // Bazowy przychód i koszt budynku
-    public int iBaseIncome;
-    public BigInteger BaseIncome;
-
+    // Bazowy koszt budynku
     public int iBaseCost;
     public BigInteger BaseCost;
 
@@ -31,14 +27,34 @@ public class Building : MonoBehaviour
     // Mnożnik kosztów budynku (1.07 - 1.15)
     public float CostMultiplier;
 
+    // Lista ulepszeń budynku (aktywne i nieaktywne). Na jej podstawie zliczane są bonusy
+    public Upgrade[] UpgradePrefabs; // -- prefaby
+
+    float UpgradesBaseShitValueMultiplier = 1;
+
+
+
+    [HideInInspector]
+    public Upgrade[] Upgrades; // -- właściwa zmienna z upgradeami
+
+    // Właściwość określa, czy budynek został postawiony za pomocą edytora.
+    // Jeżeli tak to przy burzeniu należy zwrócić część kwoty.
+    public bool IsPlacedForReal = false;
+
+    // Prefaby budynku
+    public GameObject ButtonPrefab;
+
+
+
+
     #region Generowanie
     // BAD
-    public float _shitValue = 1.0f;              // Wartość jednego G
-    public int _maximumShits = 10;               // Maksymalna ilosć G jaką może pomieścić budynek
-    public int _humansInBuilding = 1;            // Ilosć ludzi w budynku
-    public int _currentShits = 0;                // Aktualna ilość G
+    public float _shitValue;              // Wartość jednego G
+    public int _maximumShits;               // Maksymalna ilosć G jaką może pomieścić budynek
+    public int _humansInBuilding;            // Ilosć ludzi w budynku
+    public int _currentShits;                // Aktualna ilość G
     [Range(1.07f, 1.15f)]
-    public float _shitValueMultiplier = 1.15f;   // Mnożnik wartości G zakres 
+    public float _shitValueMultiplier;   // Mnożnik wartości G zakres 
 
     public float ShitValue { get { return _shitValue; } set { _shitValue = value; } }   
     public int MaximumShits { get { return _maximumShits; } set { _maximumShits = value; } }
@@ -50,23 +66,30 @@ public class Building : MonoBehaviour
     /// </summary>
     void GenerateShit()
     {
-        // Jeżeli wartość nie przekroczyła maksymalnej dopuszczalnej to zwiększa licznik
-        if(CurrentShits < MaximumShits)
+        if (BuildingType == BuildingType.Sludgeworks)
         {
-            CurrentShits += HumansInBuilding;
+            // Jeżeli jest to oczyszczalnia to nie generuje zysków
+        }
+        else
+        {
+            // Jeżeli wartość nie przekroczyła maksymalnej dopuszczalnej to zwiększa licznik
+            if (CurrentShits < MaximumShits)
+            {
+                CurrentShits += HumansInBuilding;
 
-            // Aktualizacja wskaźnika zapełnienia - jeżeli jest on wyświetlony dla tego budynku
-             if(Helper.GetGUIManager().BuildingMode_BuildingProgressBar.activeInHierarchy)
-             {
-                BuildingProgressBar progressBarScript = Helper.GetGUIManager().BuildingMode_BuildingProgressBar.GetComponent<BuildingProgressBar>();
-                if (progressBarScript != null)
+                // Aktualizacja wskaźnika zapełnienia - jeżeli jest on wyświetlony dla tego budynku
+                if (Helper.GetGUIManager().BuildingMode_BuildingProgressBar.activeInHierarchy)
                 {
-                    if(progressBarScript.GetCurrentlyFollowingBuilding() == gameObject)
+                    BuildingProgressBar progressBarScript = Helper.GetGUIManager().BuildingMode_BuildingProgressBar.GetComponent<BuildingProgressBar>();
+                    if (progressBarScript != null)
                     {
-                        progressBarScript.SetValue(this);
+                        if (progressBarScript.GetCurrentlyFollowingBuilding() == gameObject)
+                        {
+                            progressBarScript.SetValue(this);
+                        }
                     }
                 }
-             }
+            }
         }
     }
 
@@ -102,7 +125,7 @@ public class Building : MonoBehaviour
     /// <returns></returns>
     public BigInteger CurrentValue()
     {
-        float value = _currentShits * (_shitValue * Mathf.Pow((float)Math.Round(_shitValueMultiplier, 2) , (float)BuildingLevel));
+        float value = _currentShits * GetShitValue();
         return new BigInteger(Math.Round(value, 0).ToString());
     }
     #endregion
@@ -112,21 +135,7 @@ public class Building : MonoBehaviour
         // Uruchomienie mechanizmu generującego G
         InvokeRepeating("GenerateShit", 0f, 1.0f);
     }
-
-    // Lista ulepszeń budynku (aktywne i nieaktywne). Na jej podstawie zliczane są bonusy
-    public Upgrade[] UpgradePrefabs; // -- prefaby
-    float UpgradesBaseIncomeMultiplier = 1;
-
-    [HideInInspector]
-    public Upgrade[] Upgrades; // -- właściwa zmienna z upgradeami
-
-    // Właściwość określa, czy budynek został postawiony za pomocą edytora.
-    // Jeżeli tak to przy burzeniu należy zwrócić część kwoty.
-    public bool IsPlacedForReal = false;
-
-    // Prefaby budynku
-    public GameObject ButtonPrefab;
-
+    
     void Awake()
     {
         List<Upgrade> upgradesList = new List<Upgrade>();
@@ -137,9 +146,11 @@ public class Building : MonoBehaviour
         Upgrades = upgradesList.ToArray();
     }
 
+    /// <summary>
+    /// Metoda inicjalizująca bazowy koszt (potrzebna żeby przenieść wartości z inspektora do BigInteger)
+    /// </summary>
     public void InitializeBase()
     {
-        BaseIncome = new BigInteger(iBaseIncome);
         BaseCost = new BigInteger(iBaseCost);
     }
 
@@ -155,21 +166,24 @@ public class Building : MonoBehaviour
         return SimulateCost(BuildingLevel);
     }
 
+    /// <summary>
+    /// Metoda zwraca koszt budynku na danym poziomie
+    /// </summary>
+    /// <param name="level"></param>
+    /// <returns></returns>
     private BigInteger SimulateCost(int level)
     {
         return BaseCost * ((float)Math.Pow(CostMultiplier, level));
     }
 
     /// <summary>
-    /// Metoda oblicza generowany przychód na podstawie poziomu ulepszenia
+    /// Metoda zwraca wartość G
     /// </summary>
     /// <returns></returns>
-    public BigInteger GetIncome()
+    public float GetShitValue()
     {
-        if (BaseIncome == null || BaseIncome == new BigInteger("0")) InitializeBase();
-
-        // Wzór BaseIncome  * BuildingLevel
-        return (BaseIncome * UpgradesBaseIncomeMultiplier) * new BigInteger(BuildingLevel);
+        // wartość shitu = (base_value * multiplier) * (level ^ shitvaluemultiplier)
+        return (float)(BuildingLevel * (Math.Pow((float)5, _shitValueMultiplier) * UpgradesBaseShitValueMultiplier));
     }
 
     /// <summary>
@@ -198,6 +212,11 @@ public class Building : MonoBehaviour
         return this.MemberwiseClone() as Building;
     }
 
+    /// <summary>
+    /// Metoda oblicza koszt ulepszenia budynku o levels poziomów
+    /// </summary>
+    /// <param name="levels"></param>
+    /// <returns></returns>
     public BigInteger CalculateCostForNextXLevels(int levels)
     {
         BigInteger result = new BigInteger("0");
@@ -211,6 +230,11 @@ public class Building : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// Metoda uaktywnia ulepszenie
+    /// </summary>
+    /// <param name="upgrade"></param>
+    /// <returns></returns>
     public bool ActivateUpgrade(Upgrade upgrade)
     {
         bool result = false;
@@ -218,15 +242,10 @@ public class Building : MonoBehaviour
         if (Upgrades.Contains(upgrade))
         {
             Upgrade buildingUpgrade = Upgrades.FirstOrDefault(x => x.Name == upgrade.Name);
-            if (!buildingUpgrade.HasBeenBought)
-            {
-                buildingUpgrade.HasBeenBought = true;
-
-                // TODO : sprawdzać typ ulepszenia
-                UpgradesBaseIncomeMultiplier += buildingUpgrade.Value;
-
-                result = true;
-            }
+            
+            // TODO : sprawdzać typ ulepszenia
+            UpgradesBaseShitValueMultiplier += buildingUpgrade.Value;
+            result = true;
         }
 
         return result;
@@ -251,7 +270,8 @@ public class Building : MonoBehaviour
                 if (serializableUp != null)
                 {
                     upgrade.HasBeenBought = serializableUp.HasBeenBought;
-                    ActivateUpgrade(upgrade);
+                    if (upgrade.HasBeenBought)
+                        ActivateUpgrade(upgrade);
                 }
             }
         }

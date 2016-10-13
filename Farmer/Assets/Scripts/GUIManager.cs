@@ -85,6 +85,7 @@ public class GUIManager : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool("IsVisible", true);
+            BuildingMode_TimeDecreaseButton.gameObject.SetActive(false);
         }
     }
 
@@ -97,6 +98,7 @@ public class GUIManager : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool("IsVisible", false);
+            BuildingMode_TimeDecreaseButton.gameObject.SetActive(true);
         }
         EditMode_HideBuildingsPanel();
     }
@@ -246,6 +248,28 @@ public class GUIManager : MonoBehaviour
 
     #region GameStats Methods
     /// <summary>
+    /// Metoda aktualizuje napis z ogólną liczbą ludzi
+    /// </summary>
+    public void GameStats_TotalPeopleCountUpdate()
+    {
+        int peopleCount = 0;
+        GameObject buildingsGroup = Helper.GetBuildingsGroup();
+        if(buildingsGroup != null)
+        {
+            foreach(Transform transform in buildingsGroup.transform)
+            {
+                Building building = transform.GetComponent<Building>();
+                if(building != null)
+                {
+                    peopleCount += building.HumansInBuilding;
+                }
+            }
+        }
+
+        GameStats_PeopleCountText.text = peopleCount.ToString();
+    }
+
+    /// <summary>
     /// Metoda zmienia rozmiar paska doświadczenia
     /// </summary>
     /// <param name="percentage"></param>
@@ -302,7 +326,10 @@ public class GUIManager : MonoBehaviour
     public GameObject BuildingMode_UpgradesPanel;
 
     public Text BuildingMode_BuildingNameText;
-    public Text BuildingMode_BuildingIncomeText;
+    public Text BuildingMode_BuildingPeopleText;
+    public Text BuildingMode_BuildingShitValue;
+    public Text BuildingMode_BuildingMaximumShitsText;
+    public Text BuildingMode_BuildingValuePerSecondText;
     public Sprite BuildingMode_UpgradeBuildingActiveSprite;
     public Sprite BuildingMode_UpgradeBuildingNotActiveSprite;
     public Text BuildingMode_UpgradeCostText;
@@ -321,6 +348,8 @@ public class GUIManager : MonoBehaviour
     public GameObject BuildingMode_BuildingProgressBar;
 
     public Text BuildingMode_TimeToCollectShitText;
+    public Button BuildingMode_TimeDecreaseButton;
+
     #endregion
 
     #region BuildingMode Methods
@@ -375,8 +404,12 @@ public class GUIManager : MonoBehaviour
             BuildingMode_UpgradeNumberText.text = building.BuildingLevel.ToString();
 
             // Wyświetlanie informacji o koszcie i przychodzie budynku
-            BuildingMode_BuildingIncomeText.text = Helper.GetDisplayableValue(building.GetIncome());
+            BuildingMode_BuildingPeopleText.text = building.HumansInBuilding.ToString();
+            BuildingMode_BuildingShitValue.text = building.GetShitValue().ToString();
             BuildingMode_UpgradeCostText.text = Helper.GetDisplayableValue(building.GetCost());
+            BuildingMode_BuildingMaximumShitsText.text = building.MaximumShits.ToString();
+            BuildingMode_BuildingValuePerSecondText.text = (building.GetShitValue() * building.HumansInBuilding).ToString("0");
+
 
             BuildingMode_InitializeBuildingUpgradeButtons(building);
 
@@ -407,7 +440,16 @@ public class GUIManager : MonoBehaviour
             {
                 Button btn = Button.Instantiate(BuildingMode_UpgradeButtonPrefab);
 
-                btn.GetComponentInChildren<Image>().sprite = upgrade.Image;
+                if (upgrade.HasBeenBought)
+                {
+                    btn.GetComponentInChildren<Image>().sprite = upgrade.BoughtImage;
+                    btn.enabled = false;
+                }
+                else
+                {
+                    btn.GetComponentInChildren<Image>().sprite = upgrade.Image;
+                    btn.enabled = true;
+                }
 
                 BuildingUpgradeButton upgradeButtonScript = btn.GetComponent<BuildingUpgradeButton>();
                 if (upgradeButtonScript != null)
@@ -416,9 +458,12 @@ public class GUIManager : MonoBehaviour
                 }
 
                 btn.transform.SetParent(BuildingMode_UpgradesPanel.transform, false);
+
+              
             }
         }
     }
+
     /// <summary>
     /// Metoda ukrywa/pokazuje menu z upgradeami budynku
     /// </summary>

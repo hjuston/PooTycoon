@@ -15,9 +15,6 @@ public static class Helper
   /// <returns></returns>
   public static bool IsPointerAboveGUI()
   {
-#if UNITY_EDITOR
-        fingerId = -1;
-#endif
         return EventSystem.current.IsPointerOverGameObject(fingerId);
   }
 

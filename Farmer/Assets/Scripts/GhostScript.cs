@@ -120,15 +120,19 @@ public class GhostScript : MonoBehaviour
     bool drag = false;
     void OnMouseDown()
     {
-        if (!Helper.IsPointerAboveGUI() && Helper.GetGridManager().GhostObject != null)
-        {
+        if (!Helper.IsPointerAboveGUI() && 
+            Helper.GetGridManager().GhostObject != null &&
+            Helper.GetGridManager().GhostObject== gameObject)
+        { 
             drag = true;
+            CameraController.Enabled = false;
         }
     }
 
     void OnMouseUp()
     {
         drag = false;
+        CameraController.Enabled = true;
     }
 
     void OnMouseDrag()
@@ -137,7 +141,6 @@ public class GhostScript : MonoBehaviour
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hitInfo;
-
 
             if(Physics.Raycast(ray, out hitInfo))
             {

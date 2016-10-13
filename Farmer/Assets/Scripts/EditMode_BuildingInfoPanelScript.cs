@@ -9,7 +9,8 @@ public class EditMode_BuildingInfoPanelScript : MonoBehaviour
     public Text BuildingCostText;
     public Image BuildingImage;
     public Button BuyBuildingButton;
-    public Text BuildingIncomeText;
+    public Text BuildingPeopleText;
+    public GameObject RequirementsPanel;
 
     private GameObject buildingPrefab;
 
@@ -18,7 +19,7 @@ public class EditMode_BuildingInfoPanelScript : MonoBehaviour
         BuildingNameText.text = building.Name;
         BuildingDescriptionText.text = building.Description;
         BuildingCostText.text = string.Format("$ {0}", Helper.GetDisplayableValue(building.GetCost()));
-        BuildingIncomeText.text = string.Format("$ {0}", Helper.GetDisplayableValue(building.GetIncome()));
+        BuildingPeopleText.text = string.Format("{0}", building.HumansInBuilding);
 
         BuildingImage.sprite = building.BuildingImage;
 

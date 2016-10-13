@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
 
         if (SaveManager.LoadData())
         {
-            Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
+            Helper.GetGUIManager().GameStats_SetCurrentMoneyInfo(GameStats.Instance.CurrentMoney);
         }
 
         // Skrypt 'zbierający' shit z budynków co 30 sekund
@@ -62,11 +62,9 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // Sprawdzanie czy budynek został kliknięty? Jeżeli tak to wyświetlić menu ulepszeń
-        if (Input.GetMouseButtonDown(0))//(Input.touchCount > 0)
+        if (InputManager.GetInput() && !Helper.IsPointerAboveGUI())
         {
-            //if (Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
-            //{
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);//Input.GetTouch(0).position);
+            Ray ray = Camera.main.ScreenPointToRay(InputManager.GetInputPosition());
             RaycastHit hitInfo;
 
             if (Physics.Raycast(ray, out hitInfo))
@@ -76,7 +74,6 @@ public class GameManager : MonoBehaviour
                     Helper.GetGUIManager().BuildingMode_SelectBuilding(hitInfo.collider.gameObject);
                 }
             }
-            //}
         }
 
 
@@ -129,7 +126,7 @@ public class GameManager : MonoBehaviour
                 Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
             }
 
-            Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
+            Helper.GetGUIManager().GameStats_TotalPeopleCountUpdate();
         }
     }
 
@@ -150,11 +147,14 @@ public class GameManager : MonoBehaviour
     {
         if (selectedBuilding != null && selectedBuilding.Upgrades.Contains(upgrade))
         {
-            if (GameStats.Instance.GetCurrentMoney() >= new BigInteger(upgrade.Cost) && selectedBuilding.BuildingLevel >= upgrade.RequiredLevel)
+            if (GameStats.Instance.GetCurrentMoney() >= new BigInteger(upgrade.Cost) && 
+                selectedBuilding.BuildingLevel >= upgrade.RequiredLevel &&
+                !upgrade.HasBeenBought)
             {
                 // Activate upgrade
                 if (selectedBuilding.ActivateUpgrade(upgrade))
                 {
+                    upgrade.HasBeenBought = true;
                     GameStats.Instance.SpendMoney(new BigInteger(upgrade.Cost));
 
                     Helper.GetGUIManager().BuildingMode_SetBuildingInfo(selectedBuilding);
@@ -163,7 +163,7 @@ public class GameManager : MonoBehaviour
                         Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(selectedBuilding, upgradeBy);
                     }
 
-                    Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
+                    Helper.GetGUIManager().GameStats_TotalPeopleCountUpdate();
                 }
             }
         }

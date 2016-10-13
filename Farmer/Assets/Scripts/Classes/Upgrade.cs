@@ -19,6 +19,7 @@ public class Upgrade : ScriptableObject
 
     [Header("Look")]
     public Sprite Image;
+    public Sprite BoughtImage;
 
 
     public Upgrade GetCopy()

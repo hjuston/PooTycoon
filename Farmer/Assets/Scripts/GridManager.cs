@@ -20,12 +20,10 @@ public class GridManager : MonoBehaviour
         // można go wtedy przenieść lub sprzedać
         if (Helper.GetGameManager().IsEditMode())
         {
-            if (Input.GetMouseButtonDown(0) && !Helper.IsPointerAboveGUI())//(Input.touchCount > 0)
+            if (InputManager.GetInput() && !Helper.IsPointerAboveGUI())
             {
-                //if(Input.GetTouch(0).phase == TouchPhase.Began && !Helper.IsPointerAboveGUI())
-                //{
                 RaycastHit hitInfo;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);//Input.GetTouch(0).position);
+                Ray ray = Camera.main.ScreenPointToRay(InputManager.GetInputPosition());
 
                 if (Physics.Raycast(ray, out hitInfo))
                 {
@@ -39,8 +37,6 @@ public class GridManager : MonoBehaviour
                     }
                 }
             }
-            
-            //}
         }
     }
 
@@ -112,7 +108,7 @@ public class GridManager : MonoBehaviour
 
             GhostObject = null;
             Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(false);
-            Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
+            Helper.GetGUIManager().GameStats_TotalPeopleCountUpdate();
         }
     }
 
@@ -144,7 +140,6 @@ public class GridManager : MonoBehaviour
         GhostObject = null;
     }
 
-
     /// <summary>
     /// Jeżeli ghost jest wybudowanym wczesniej budynkiem to go sprzedaje. ( po kliknięciu przycisku sell )
     /// </summary>
@@ -164,7 +159,7 @@ public class GridManager : MonoBehaviour
         }
 
         Helper.GetGUIManager().EditMode_SetGhostPositionGroupVisible(false);
-        Helper.GetGUIManager().GameStats_SetIncomeInfo(GameStats.Instance.GetCurrentIncome());
+        Helper.GetGUIManager().GameStats_TotalPeopleCountUpdate();
         GameObject.Destroy(GhostObject);
         GhostObject = null;
     }

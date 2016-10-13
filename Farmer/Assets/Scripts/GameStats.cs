@@ -110,7 +110,6 @@ public class GameStats
             Helper.GetGUIManager().GameStats_SetCurrentMoneyInfo(value.CurrentMoney);
             Helper.GetGUIManager().GameStats_SetExperienceValue(value.CurrentExperience, value.RequiredExperience);
             Helper.GetGUIManager().GameStats_SetExperienceBarValue((float)value.CurrentExperience / (float)value.RequiredExperience);
-            Helper.GetGUIManager().GameStats_SetIncomeInfo(value.GetCurrentIncome());
         }
     }
 
@@ -146,24 +145,6 @@ public class GameStats
         }
 
         ShitCollected = true;
-    }
-
-    public BigInteger GetCurrentIncome()
-    {
-        BigInteger income = new BigInteger("0");
-
-        GameObject buildingGroup = Helper.GetBuildingsGroup();
-        if (buildingGroup != null)
-        {
-            Building[] buildings = buildingGroup.GetComponentsInChildren<Building>();
-
-            foreach (Building building in buildings)
-            {
-                //income += building.TakeShit(); //building.GetIncome();
-            }
-        }
-
-        return income;
     }
 
     /// <summary>

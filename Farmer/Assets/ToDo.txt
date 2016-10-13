@@ -124,10 +124,10 @@ TODO:
 
 29. Zmienić mechanizmy
 	- Każdy budynek ma swoje życie
-		- produkcja shitu zajmuje ~10 sekund
-		- automatyczne zbieranie co 30 sekund (2-3x strata)
-		- możliwość ręcznego zbierania
-		- wskaźnik zapełnienia przy każdym budynku?
+	OK	- produkcja shitu zajmuje ~10 sekund
+	OK	- automatyczne zbieranie co 30 sekund (2-3x strata)
+	OK  - możliwość ręcznego zbierania (przycisk przyspieszający czas)
+	OK	- wskaźnik zapełnienia przy każdym budynku?
 		- automat za punkty premium zbierający odrazu z wszystkich budynków
 	- Ilość maksymalnej obróbki shitu przez oczyszczalnię
 		- jak wypuszczanie kurczaków
