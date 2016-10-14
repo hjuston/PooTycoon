@@ -48,6 +48,9 @@ public class GridManager : MonoBehaviour
         if (GhostObject == null)
         {
             GhostObject = GameObject.Instantiate<GameObject>(prefab);
+
+            Building.CopyValues(prefab, GhostObject);
+
             ActivateGhostObject();
         }
     }

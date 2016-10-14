@@ -32,8 +32,6 @@ public class Building : MonoBehaviour
 
     float UpgradesBaseShitValueMultiplier = 1;
 
-
-
     [HideInInspector]
     public Upgrade[] Upgrades; // -- właściwa zmienna z upgradeami
 
@@ -43,23 +41,26 @@ public class Building : MonoBehaviour
 
     // Prefaby budynku
     public GameObject ButtonPrefab;
-
-
-
-
+    
     #region Generowanie
-    // BAD
-    public float _shitValue;              // Wartość jednego G
-    public int _maximumShits;               // Maksymalna ilosć G jaką może pomieścić budynek
-    public int _humansInBuilding;            // Ilosć ludzi w budynku
-    public int _currentShits;                // Aktualna ilość G
+    [Header("Generowanie")]
+    [SerializeField]
+    private float _shitValue;              // Wartość jednego G
+    private BigInteger _maximumShits;               // Maksymalna ilosć G jaką może pomieścić budynek
+    [SerializeField]
+    private int _humansInBuilding;            // Ilosć ludzi w budynku
+    private BigInteger _currentShits;                // Aktualna ilość G
     [Range(1.07f, 1.15f)]
-    public float _shitValueMultiplier;   // Mnożnik wartości G zakres 
+    private float _shitValueMultiplier;   // Mnożnik wartości G zakres 
 
-    public float ShitValue { get { return _shitValue; } set { _shitValue = value; } }   
-    public int MaximumShits { get { return _maximumShits; } set { _maximumShits = value; } }
+    public BigInteger MaximumShits { get { return _maximumShits; } set { _maximumShits = value; } }
     public int HumansInBuilding { get { return _humansInBuilding; } set { _humansInBuilding = value; } }
-    public int CurrentShits { get { return _currentShits; } set { _currentShits = value; } }
+    public BigInteger CurrentShits { get { return _currentShits; } set { _currentShits = value; } }
+
+    [Header("Tylko dla oczyszczalni")]
+    public float Sludgeworks_MaximumShits;              // 100
+    public float Sludgeworks_CurrentAvailableShits;     // 100
+    public float Sludgeworks_RegenerationValue;         // 10
 
     /// <summary>
     /// Metoda wywoływana co sekundę
@@ -69,6 +70,10 @@ public class Building : MonoBehaviour
         if (BuildingType == BuildingType.Sludgeworks)
         {
             // Jeżeli jest to oczyszczalnia to nie generuje zysków
+            if (Sludgeworks_CurrentAvailableShits < Sludgeworks_MaximumShits)
+            {
+                Sludgeworks_CurrentAvailableShits += Sludgeworks_RegenerationValue * Time.deltaTime;
+            }
         }
         else
         {
@@ -97,10 +102,20 @@ public class Building : MonoBehaviour
     /// Metoda powoduje 'zabranie' przez skrypt oczyszczalni G z danego budynku
     /// </summary>
     /// <returns></returns>
-    public BigInteger TakeShit()
+    public BigInteger TakeShit(float maximum = 0)
     {
         BigInteger toReturn = CurrentValue();
-        _currentShits = 0;
+        BigInteger max = new BigInteger(maximum.ToString("0"));
+
+        if (maximum != 0 && toReturn > max)
+        {
+            toReturn = max;
+            _currentShits -= max;
+        }
+        else
+        {
+            _currentShits = 0;
+        }
 
         // Aktualizacja wskaźnika zapełnienia - jeżeli jest on wyświetlony dla tego budynku
         if (Helper.GetGUIManager().BuildingMode_BuildingProgressBar.activeInHierarchy)
@@ -125,9 +140,9 @@ public class Building : MonoBehaviour
     /// <returns></returns>
     public BigInteger CurrentValue()
     {
-        float value = _currentShits * GetShitValue();
-        return new BigInteger(Math.Round(value, 0).ToString());
-    }
+        BigInteger value = _currentShits * GetShitValue();
+        return value;
+    } 
     #endregion
 
     void Start()
@@ -182,8 +197,7 @@ public class Building : MonoBehaviour
     /// <returns></returns>
     public float GetShitValue()
     {
-        // wartość shitu = (base_value * multiplier) * (level ^ shitvaluemultiplier)
-        return (float)(BuildingLevel * (Math.Pow((float)5, _shitValueMultiplier) * UpgradesBaseShitValueMultiplier));
+        return (float)(BuildingLevel * (Math.Pow((float)3, _shitValueMultiplier) * UpgradesBaseShitValueMultiplier));
     }
 
     /// <summary>
@@ -251,13 +265,27 @@ public class Building : MonoBehaviour
         return result;
     }
 
+
+    /// <summary>
+    /// Głównie chodzi o wartości BigInteger
+    /// </summary>
+    public static void CopyValues(GameObject fromPrefab, GameObject toInstance)
+    {
+        Building prefabScript = fromPrefab.GetComponent<Building>();
+        Building instanceScript = toInstance.GetComponent<Building>();
+
+        // Kopiowanie wartosci z prefaba do instancji
+        instanceScript.CurrentShits = prefabScript.CurrentShits;
+        instanceScript.MaximumShits = prefabScript.MaximumShits;
+    }
+
     // System save-load
     public void LoadBuilding(SerializableBuilding serializableBuilding)
     {
         // Ustawianie wartości pozycji i rotacji
         transform.position = new Vector3(serializableBuilding.PositionX, serializableBuilding.PositionY, serializableBuilding.PositionZ);
         transform.localRotation = new Quaternion(serializableBuilding.RotationX, serializableBuilding.RotationY, serializableBuilding.RotationZ, serializableBuilding.RotationW);
-
+        
         // Ustawianie wartości budynku
         BuildingLevel = serializableBuilding.BuildingLevel;
         IsPlacedForReal = serializableBuilding.IsPlacedForReal;

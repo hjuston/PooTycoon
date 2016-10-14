@@ -10,7 +10,8 @@ public class BuildingProgressBar : MonoBehaviour
 	
     public void SetValue(Building building)
     {
-        float percentage = (float)building.CurrentShits / (float)building.MaximumShits;
+        BigInteger temp = ((new BigInteger(100) * building.CurrentShits) + (building.MaximumShits / new BigInteger(2))) / building.MaximumShits;
+        float percentage = (float)int.Parse(temp.ToString()) / 100f;
 
         if (percentage > 1f) percentage = 1f;
         if (percentage < 0f) percentage = 0f;

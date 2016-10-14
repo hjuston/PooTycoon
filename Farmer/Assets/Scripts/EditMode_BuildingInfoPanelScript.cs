@@ -16,6 +16,9 @@ public class EditMode_BuildingInfoPanelScript : MonoBehaviour
 
     public void Initialize(Building building, GameObject buildingPrefab)
     {
+        Building b = buildingPrefab.GetComponent<Building>();
+
+
         BuildingNameText.text = building.Name;
         BuildingDescriptionText.text = building.Description;
         BuildingCostText.text = string.Format("$ {0}", Helper.GetDisplayableValue(building.GetCost()));

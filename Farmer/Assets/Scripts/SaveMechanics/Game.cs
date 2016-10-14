@@ -100,6 +100,7 @@ public class Game
                             Building instanceScript = objInst.GetComponent<Building>();
                             if (instanceScript != null)
                             {
+                                Building.CopyValues(dbBuilding, objInst);
                                 instanceScript.LoadBuilding(serializableBuilding);
                             }
                         }

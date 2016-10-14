@@ -47,53 +47,6 @@ public class GameStats
             Helper.GetGUIManager().BuildingMode_UpdateBuildingLevelCostInfo(Helper.GetGameManager().GetCurrentlySelectedBuilding(), Helper.GetGameManager().GetUpgradeByValue());
         }
     }
-    
-    //public void LoadBuildingToWorld()
-    //{
-    //    if (Buildings != null)
-    //    {
-    //        foreach (SerializableBuilding serBuilding in Buildings)
-    //        {
-    //            GameObject[] buildings = BuildingsDatabase.GetBuildingsByType(serBuilding.BuildingType);
-    //            foreach(GameObject building in buildings)
-    //            {
-    //                Building script = building.GetComponent<Building>();
-    //                if(script != null)
-    //                {
-    //                    if (script.Name == serBuilding.BuildingName)
-    //                    {
-    //                        // Znaleziono budynek
-    //                        GameObject objInst = GameObject.Instantiate(building);
-    //                        objInst.transform.SetParent(Helper.GetBuildingsGroup().transform, true);
-
-    //                        objInst.transform.position = new Vector3(serBuilding.PositionX, serBuilding.PositionY, serBuilding.PositionZ);
-    //                        objInst.transform.localRotation = new Quaternion(serBuilding.RotationX, serBuilding.RotationY, serBuilding.RotationZ, serBuilding.RotationW);
-
-    //                        Building objectsScript = objInst.GetComponent<Building>();
-    //                        if (objectsScript != null)
-    //                        {
-    //                            objectsScript.BuildingLevel = serBuilding.BuildingLevel;
-    //                            objectsScript.IsPlacedForReal = serBuilding.IsPlacedForReal;
-
-    //                            if (objectsScript.Upgrades != null)
-    //                            {
-    //                                foreach (Upgrade up in objectsScript.Upgrades)
-    //                                {
-    //                                    SerializableUpgrade serializableUp = serBuilding.Upgrades.FirstOrDefault(x => x.Name == up.Name);
-    //                                    if (serializableUp != null)
-    //                                    {
-    //                                        up.HasBeenBought = serializableUp.HasBeenBought;
-    //                                    }
-    //                                }
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-
-    //        }
-    //    }
-    //}
 
     static GameStats _instance;
     public static GameStats Instance
@@ -137,15 +90,51 @@ public class GameStats
             {
                 Building[] buildings = buildingGroup.GetComponentsInChildren<Building>();
 
+                float howManyCanTake = HowManyShitCanTake();
+
                 foreach (Building building in buildings)
                 {
-                    CurrentMoney += building.TakeShit();
+                    if (building.BuildingType != BuildingType.Sludgeworks)
+                    {
+                        if (new BigInteger(howManyCanTake.ToString("0")) < building.CurrentShits)
+                        {
+                            // Jeżeli zabrać może mniej niż ma budynek
+                            // to zabiera tyle co może, a budynkowi odbiera tylko tyle co zabralo
+                            CurrentMoney += building.TakeShit(howManyCanTake);
+                            break;
+                        }
+                        else
+                        {
+                            // Jeżeli może zabrać to zabiera 
+                            CurrentMoney += building.TakeShit();
+                        }
+                    }
                 }
             }
         }
 
         ShitCollected = true;
     }
+
+    float HowManyShitCanTake()
+    {
+        float result = 0f;
+
+        GameObject buildingGroup = Helper.GetBuildingsGroup();
+        if (buildingGroup != null)
+        {
+            Building[] buildings = buildingGroup.GetComponentsInChildren<Building>();
+
+            foreach (Building building in buildings)
+            {
+                if (building.BuildingType == BuildingType.Sludgeworks)
+                    result += building.Sludgeworks_CurrentAvailableShits;
+            }
+        }
+
+        return result;
+    }
+
 
     /// <summary>
     /// Metoda zwraca aktualną ilość gotówki.
